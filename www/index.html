@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="stylesheet" type="text/css" href="css/StyleInputs.css">
+        <link rel="stylesheet" type="text/css" href="fonts/style.css">
+        <title>Pesa Suínos Agrosys</title>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="plugins/jquery/jquery-3.7.0.min.js"></script>
+        <script type="text/javascript" src="plugins/snackbar/snackbar.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="plugins/snackbar/snackbar.min.css">
+        <link rel="stylesheet" type="text/css" href="plugins/sweetalert/sweetalert2.min.css">
+        <script type="text/javascript" src="plugins/sweetalert/sweetalert2.min.js"></script>
+        <script type="text/javascript" src="js/dexie.min.js"></script>
+        <script type="text/javascript" src="js/db.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </head>
+    <body style="overflow: hidden; background: white;">
+        <div id="Login" class="MainApp">
+            <div class="menu_area_body">
+                <div class="menu_area_body_dados" style="justify-content: center;">
+                    <div class="logoAgrosys"></div>
+
+                    <img class="IconApp" src="img/iconExterno.png">
+                    <div class="fieldNomeApp">Pesagem de Suínos</div>
+                    
+                    <p style="font-size: 18px;margin-bottom: 10px;color: #7db5e1;">Informe o código de acesso:</p>
+        
+                    <div class="material-textfield" style="width: 100%;max-width: 350px;">
+                        <span class="icon-WEB_www FixedIconInput ICleft"></span>
+                        <input class="input AgroNumber" id="CodAcesso" placeholder=" " type="tel" style="width: 100%;padding-left:40px">
+                    </div>                    
+                </div> 
+            </div>
+            <div class="menu_area_footer" style="display: flex; align-items: center; justify-content: center;">
+                <button type="button" id="button" class="BtFooter" onclick="ValidaCodAcesso()">Acessar</button>
+            </div>
+        </div>
+
+        <div id="ErroToken" class="MainApp" style="display:none;">
+            <div class="menu_area_body">
+                <div class="menu_area_body_dados" style="justify-content: center;">
+                    <div class="logoAgrosys"></div>
+
+                    <img class="IconApp" src="img/iconExterno.png">
+                    <div class="fieldNomeApp">e-Agrosys</div>
+                    
+                    <p style="font-size:16px;margin-bottom:5px;color:#7db5e1;">Erro ao obter token do dispositivo.</p>
+                    <p style="font-size:16px;margin-bottom:10px;color:#7db5e1;">Verifique sua conexão e tente novamente.</p>
+                    
+        
+                    <button type="button" id="button" class="BtFooter" onclick="getNewToken()">Tentar Novamente</button>
+                </div> 
+            </div>
+            <div class="menu_area_footer" style="display: flex; align-items: center; justify-content: center;">
+            </div>
+        </div>
+
+        <div id="APPload" class="loadModal">
+            <div class="loadModalFlex">
+                <span id="APPloadText" class="LoadModalText"></span>
+                <img src="img/LoadOpenModals.gif" style="width: 90%;max-width: 220px;">
+            </div>
+        </div>  
+        
+        <div id="CameraContainer" class="loadCameraMen" style="background-color: black;">
+            <div style="width:100%;height:80%;"></div>
+            <div style="width:100%;height:20%;">
+                <div style="width:100%;height:100%;display: flex;align-items: center;justify-content: center;position: relative;">
+                    <img src="img/Camera_Return.svg" alt="Close Camera" class="CameraClose" onclick="CloseCamera()">
+                    <button type="button" class="CameraClick" onclick="onSuccessCamera()"></button>
+                    <img id="Camera_Flash_off" src="img/Camera_flash_off.svg" alt="Flash Off" style="display:block;" class="CameraFlash" onclick="LigarFlash()">
+                    <img id="Camera_Flash_on" src="img/Camera_flash_on.svg" alt="Flash Off" style="display:none;" class="CameraFlash" onclick="DesligarFlash()">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

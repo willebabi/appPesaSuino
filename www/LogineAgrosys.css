@@ -1,0 +1,361 @@
+@font-face{
+    font-family: "Open Sans";
+    src: url('./fonts/OpenSans-Light.ttf');
+}
+
+@font-face{
+    font-family: "Open Sans";
+    src: url('./fonts/OpenSans-Regular.ttf');
+    font-weight: 400;
+}
+
+@font-face{
+    font-family: "Open Sans";
+    src: url('./fonts/OpenSans-SemiBold.ttf');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: "Uni Sans";
+    src: url('./fonts/uni-sans-book-italic.ttf');
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+p,input[type="radio" i]{margin:0px;}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:white;    
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 400;
+    font-size:12px;
+    height:100vh;
+    margin:0px;
+    padding:0px;
+    /* Padding to avoid the "unsafe" areas behind notches in the screen */
+    /* padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); */
+    width:100%;
+}
+
+html, body, .ion-app, .ion-content {
+    background-color: transparent;
+}
+
+button{
+    font-family: 'Open Sans', sans-serif !important;
+}
+
+h1 {
+    font-size:24px;
+    font-weight:normal;
+    margin:0px;
+    overflow:visible;
+    padding:0px;
+    text-align:center;
+}
+
+.IconApp{
+    margin-bottom:15px;width:70px;
+}
+.fieldNomeApp{
+    font-family: "Uni Sans", sans-serif !important;
+    margin-bottom: 60px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #46aebb;
+}
+
+@keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+
+.FixedIconInput{
+    position: absolute;
+    top: 0px;
+    font-size: 20px;
+    color: #79b7e7;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.FixedIconInput.ICleft{
+    left: 0px;
+}
+.FixedIconInput.ICright{
+    right: 0px;
+}
+
+.loadModal{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    z-index: 99999;    
+    background-color: #000000ad; /*#0000007a;*/
+}
+.loadBlack{
+    background-color: #000000 !important;
+    display: initial !important;
+}
+.loadModalFlex{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.LoadModalText{
+    color: white;
+    font-size: 17px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.MainApp{
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.menu_area_body{
+    height: 100%;
+    background-color: white;
+    overflow: auto;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    justify-content: center;
+    position: relative;
+}
+
+.menu_area_body > div:last-child{
+    margin-bottom: 10px;
+}
+.menu_area_footer{
+    min-height: 70px;max-height: 70px;
+    background-color: #073751;
+    border-top-left-radius: 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.BtFooter{
+    width: 70%;
+    max-width: 300px;
+    height: 40px;
+    font-size: 18px;
+    background-color: #46aebc;
+    color: white;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0px;
+    outline: none;
+}
+.BtBody{
+    width: 70%;    
+    height: 40px;
+    font-size: 18px;
+    background-color: #216083;
+    color: white;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0px;
+    outline: none;
+}
+
+.logoAgrosys {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+        
+    width: 180px;
+    height: 33px;
+    max-width: 50%;
+    background-image: url("./img/logo_agrosys.png");
+    background-repeat: no-repeat;
+    background-size: 180px;
+}
+
+.LoadArea{
+    display: flex;
+    flex-direction: column;
+    height: 0px;
+    width: 100%;
+    overflow: hidden;
+    z-index: 99;
+    transition: all 0.2s ease-in;
+    position: fixed;
+    bottom: 0;
+    background-color: white;
+}
+
+.area_bodyLoad{
+    height: 25%;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.area_footerLoad{
+    height: 75%;
+    width: 100%;
+    background-color: #073751;
+    border-top-left-radius: 100px;
+    color: #46aebcff;
+
+    display: flex;
+    align-items: center;                
+    flex-direction: column;
+}
+
+
+
+@media only screen and (max-height : 450px) {
+    .IconApp{        
+        margin-top: 60px;
+        width: 50px;
+    }
+    .fieldNomeApp{
+        margin-bottom:10px;
+        font-size: 24px;
+    }
+    .menu_area_body{justify-content: flex-start;}
+}
+
+
+
+
+.swal2-container{
+    width: 100% !important;
+}
+.swal2-toast{
+    max-width: 380px !important;
+}
+body.swal2-toast-shown .swal2-container{
+    background-color: rgba(0,0,0,.6) !important;
+    pointer-events: all !important;
+}
+.swal2-popup{
+    font-family: 'Open Sans', sans-serif !important;
+}
+.swal2-confirm, .swal2-deny, .swal2-cancel{
+    min-width: 95px;
+}
+.swal2-popup.swal2-toast{
+    padding: 1em 10px !important;
+}
+.swal2-popup.swal2-toast .swal2-actions{
+    padding: 0px !important;
+}
+.swal2-popup.swal2-toast .swal2-html-container{
+    margin: .5em 0px .5em 1em !important;
+}
+.denyAgro{
+    margin-left: auto !important;
+}
+
+/*ESTILO DOS INPUTS*/
+.inputDisabled, .inputDisabled ~ label, input:disabled, input:disabled ~ label, select:disabled, select:disabled ~ label, textarea:disabled, textarea:disabled ~ label{
+    color: gray !important;
+    border-color: gray !important;
+    background-color: white;
+    opacity: 1 !important;
+    -webkit-text-fill-color: gray !important;
+}
+
+input.input::placeholder {
+    color: #79b7e7;
+    font-size: 16px;
+}
+
+.material-textfield {
+    position: relative;  
+    background-color: white;
+    margin-top:12px;
+}
+.label {
+    position: absolute;
+    font-size: 16px;
+    height: 16px; /*height sempre igual ao font-size*/
+    left: 0;
+    top: 50%;
+    transform: translateY(-65%);
+    background-color: white;
+    color: #79b7e7;
+    padding: 0 0.3rem;
+    margin: 0 0.5rem;
+    transition: .1s ease-out;
+    transform-origin: left top;
+    pointer-events: none;
+}
+.labelTextArea{
+    top: 18%;
+}
+.input, .inputDate {
+    font-size: 16px;
+    outline: none;
+    border: 1px solid #79b7e7;
+    border-radius: 5px;  
+    padding: 7px ;
+    padding-top: 8px ;
+    padding-bottom: 6px ;
+    color: rgb(56, 56, 56);
+    transition: 0.1s ease-out;
+    height: 41px;
+    box-sizing: border-box;
+    background-color: white;
+
+    -webkit-appearance: none;
+}
+.input:focus, .inputDate:focus {
+    border-color: #2e6e9e ;
+}
+.input:focus + label, .inputDate:focus + label {
+    color: #2e6e9e;
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.input:not(:placeholder-shown) + label {
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.material-checkbox{
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.material-checkbox input{
+    margin: 0px;
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
+}
+
+.labelCheck{
+    color: #7db5e1;
+    font-size: 16px;
+}

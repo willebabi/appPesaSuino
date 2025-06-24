@@ -1,0 +1,206 @@
+.inputDisabled, .inputDisabled ~ label, input:disabled, input:disabled ~ label, select:disabled, select:disabled ~ label, textarea:disabled, textarea:disabled ~ label{
+    color: gray !important;
+    border-color: gray !important;
+    background-color: white;
+    opacity: 1 !important;
+    -webkit-text-fill-color: gray !important;
+}
+select:disabled ~ label{
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.material-textfield {
+    position: relative;  
+    background-color: white;
+    margin-top:12px;
+}
+.label {
+    position: absolute;
+    font-size: 16px;
+    height: 16px; /*height sempre igual ao font-size*/
+    left: 0;
+    top: 50%;
+    transform: translateY(-65%);
+    background-color: white;
+    color: #79b7e7;
+    padding: 0 0.3rem;
+    margin: 0 0.5rem;
+    transition: .1s ease-out;
+    transform-origin: left top;
+    pointer-events: none;
+}
+.labelTextArea{
+    top: 18%;
+}
+.input, .inputDate {
+    font-size: 16px;
+    outline: none;
+    border: 1px solid #79b7e7;
+    border-radius: 5px;  
+    padding: 7px ;
+    padding-top: 8px ;
+    padding-bottom: 6px ;
+    color: rgb(56, 56, 56);
+    transition: 0.1s ease-out;
+    height: 41px;
+    box-sizing: border-box;
+    background-color: white;
+
+    -webkit-appearance: none;
+}
+.input:focus, .inputDate:focus {
+    border-color: #2e6e9e ;
+}
+.input:focus + label, .inputDate:focus + label {
+    color: #2e6e9e;
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.input:not(:placeholder-shown) + label {
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.inputDate:valid + label {
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+.select {   
+    position: relative;
+    margin-top:12px;
+}
+.select-text {
+    font-size: 16px;
+    outline: none;
+    border: 1px solid #79b7e7;
+    border-radius: 5px;  
+    padding-left: 7px;
+    padding-right: 30px;
+    background-color: transparent;
+    transition: 0.1s ease-out;
+    height: 41px;
+}
+.select-text:focus {
+    outline: none;
+    border-color: #2e6e9e ;
+}
+.select .select-text {
+    appearance: none;
+    -webkit-appearance:none;
+    color: rgb(56, 56, 56);
+}
+.select0:after {
+    position: absolute;      
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Estilo da seta do select */
+    width: 0;
+    height: 0;
+    padding: 0;
+    content: '';
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #79b7e7;
+    pointer-events: none;
+}
+.select-label {
+    position: absolute;
+    font-size: 16px;
+    height: 16px; /*height sempre igual ao font-size*/
+    left: 0;
+    top: 50%;
+    transform: translateY(-65%);
+    background-color: white;
+    color: #79b7e7;
+    padding: 0 0.3rem;
+    margin: 0 0.5rem;
+    transition: .1s ease-out;
+    transform-origin: left top;
+    pointer-events: none;
+}
+.select-text:focus ~ .select-label, .select-text:valid ~ .select-label {
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+.select-text:focus ~ .select-label{
+    color: #2e6e9e;
+    top: 0;
+    transform: translateY(-65%) scale(.9);
+}
+
+p,input[type="radio" i]{margin:0px;}
+
+.material-textfield > .input > .material-radiobox{
+    border-top: 1px solid #cfe0e9;
+}
+
+.material-textfield > .input > .material-radiobox:first-child{
+    border-top: 0px;
+}
+
+.material-radiobox{
+    display: flex;
+    justify-content: left;
+    align-items: center;    
+    padding: 2px;
+    position: relative;
+    min-height: 23px;
+    cursor: pointer;
+
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+.material-radiobox > input {
+    margin: 0px 5px;
+}
+.labelradio{
+    color: #79b7e7;
+    pointer-events: none;
+}
+
+.material-radiobox > input[type="radio"] {    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;    
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    padding: 3px;
+    background-clip: content-box;
+    border: 1px solid #79b7e7;
+    background-color: white;
+    border-radius: 50%;
+    outline: none;
+}
+.material-radiobox > input[type="radio"]:checked {
+    background-color: #79b7e7;
+}
+
+.StyledCheck{
+    width: 14px !important;
+    height: 14px !important;
+    margin: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: 1px solid #79b7e7;
+    box-shadow: none;
+    text-align: center;
+    line-height: 1em;
+    background: white;
+}
+.StyledCheck:checked{
+    background-color: #79b7e7;
+}
+.StyledCheck:checked:after {
+    content: '\2714';
+    color: white;
+}
+
+.AgrupaFields{
+    display: flex;
+    width: 100%;
+}

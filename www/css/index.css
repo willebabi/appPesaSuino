@@ -1,0 +1,258 @@
+@font-face{
+    font-family: "Open Sans";
+    src: url('../fonts/OpenSans-Light.ttf');
+}
+
+@font-face{
+    font-family: "Open Sans";
+    src: url('../fonts/OpenSans-Regular.ttf');
+    font-weight: 400;
+}
+
+@font-face{
+    font-family: "Open Sans";
+    src: url('../fonts/OpenSans-SemiBold.ttf');
+    font-weight: 600;
+}
+@font-face {
+    font-family: "Uni Sans";
+    src: url('../fonts/uni-sans-book-italic.ttf');
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:white;    
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 400;
+    font-size:12px;
+    height:100vh;
+    margin:0px;
+    padding:0px;
+    /* Padding to avoid the "unsafe" areas behind notches in the screen */
+    /* padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); */
+    width:100%;
+}
+
+html, body, .ion-app, .ion-content {
+    background-color: transparent;
+}
+
+button{
+    font-family: 'Open Sans', sans-serif !important;
+}
+
+h1 {
+    font-size:24px;
+    font-weight:normal;
+    margin:0px;
+    overflow:visible;
+    padding:0px;
+    text-align:center;
+}
+
+.IconApp{
+    margin-bottom:15px;width:70px;
+}
+.fieldNomeApp{
+    font-family: "Uni Sans", sans-serif !important;
+    margin-bottom: 60px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #46aebb;
+}
+
+@media only screen and (max-height : 450px) {
+    .IconApp{        
+        margin-top: 60px;
+        width: 50px;
+    }
+    .fieldNomeApp{
+        margin-bottom:10px;
+        font-size: 24px;
+    }
+}
+
+
+@keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.4; }
+    to { opacity: 1.0; }
+}
+
+.FixedIconInput{
+    position: absolute;
+    top: 0px;
+    font-size: 20px;
+    color: #79b7e7;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.FixedIconInput.ICleft{
+    left: 0px;
+}
+.FixedIconInput.ICright{
+    right: 0px;
+}
+
+.swal2-container{
+    width: 100% !important;
+}
+.swal2-toast{
+    max-width: 380px !important;
+}
+body.swal2-toast-shown .swal2-container{
+    background-color: rgba(0,0,0,.6) !important;
+    pointer-events: all !important;
+}
+.swal2-popup{
+    font-family: 'Open Sans', sans-serif !important;
+}
+.swal2-confirm, .swal2-deny, .swal2-cancel{
+    min-width: 95px;
+}
+.swal2-popup.swal2-toast{
+    padding: 1em 10px !important;
+}
+.swal2-popup.swal2-toast .swal2-actions{
+    padding: 0px !important;
+}
+.swal2-popup.swal2-toast .swal2-html-container{
+    margin: .5em 0px .5em 1em !important;
+}
+.denyAgro{
+    margin-left: auto !important;
+}
+
+.Versaoapp{
+    color: #7eb8c4;
+    position: fixed;
+    bottom: 0px;
+    right: 2px;
+    font-weight: 600;
+}
+.VersaoappIOS{
+    position: absolute !important;
+    top: 2px;
+    bottom: auto !important;
+}
+
+.loadModal{
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    z-index: 99999;    
+    background-color: #000000ad; /*#0000007a;*/
+}
+.loadBlack{
+    background-color: #000000 !important;
+    display: initial !important;
+}
+.loadModalFlex{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.LoadModalText{
+    color: white;
+    font-size: 17px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.MainApp{
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.menu_area_body{
+    height: 100%;
+    background-color: #073751;
+    overflow: auto;
+}
+.menu_area_body_dados{
+    /* width: 100%; */
+    height: 100%;
+    background-color: white;
+    border-top-left-radius: 70px;
+    overflow: auto;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    
+}
+.menu_area_body_dados > div:last-child{
+    margin-bottom: 10px;
+}
+.menu_area_footer{
+    min-height: 70px;max-height: 70px;
+    background-color: #073751;
+    border-top-left-radius: 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.BtFooter{
+    width: 70%;
+    max-width: 300px;
+    height: 40px;
+    font-size: 18px;
+    background-color: #46aebc;
+    color: white;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0px;
+    outline: none;
+}
+.BtBody{
+    width: 70%;    
+    height: 40px;
+    font-size: 18px;
+    background-color: #216083;
+    color: white;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0px;
+    outline: none;
+}
+
+.logoAgrosys {
+    position: absolute;
+    top: 10px;
+    right: 5px;
+        
+    width: 180px;
+    height: 33px;
+    max-width: 50%;
+    background-image: url("../img/logo_agrosys.png");
+    background-repeat: no-repeat;
+    background-size: 180px;
+}
+
+.loadCameraMen{visibility: hidden;transition: opacity 600ms, visibility 600ms;opacity: 0;width: 100%;height: 100%;position: fixed;left: 0px;top: 0px;z-index: 1000;background-color:black;font-family: "Open Sans", sans-serif;text-align: center;display: flex;flex-direction: column;}
+.divshowCamera{visibility: visible;opacity: 1;}
+.CameraClick{margin-top:10px;width: 80px;height: 80px;background-color: white;border-radius: 50%;padding: 0px;margin: 10px;border: none;}
+.CameraClick:active{background-color: grey;}
+.CameraClose{position: absolute;left: 40px;width: 55px;height: 55px;}
+.CameraFlash{position: absolute;right: 40px;width: 40px;height: 40px;}

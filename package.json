@@ -1,0 +1,57 @@
+{
+  "name": "com.agrosys.apppesasuino",
+  "displayName": "Pesa Suínos",
+  "version": "1.0.0",
+  "description": "A sample Apache Cordova application that responds to the deviceready event.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@havesource/cordova-plugin-push": "^1.0.0"
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-file": {},
+      "cordova-plugin-advanced-http": {},
+      "cordova-plugin-app-exit": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-enable-cleartext-traffic": {},
+      "cordova-plugin-ios-disable-bounce": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-camera-preview": {},
+      "@globules-io/cordova-plugin-ios-xhr": {},
+      "cordova-support-android-plugin": {},
+      "cordova-plugin-clear-data": {},
+      "cordova-plugin-networkinterface": {},
+      "cordova-plugin-keyboard": {},
+      "cordova-plugin-android-permissions": {}
+    },
+    "platforms": [
+      "android"
+    ]
+  },
+  "devDependencies": {
+    "@globules-io/cordova-plugin-ios-xhr": "^1.2.4",
+    "cordova-android": "^14.0.1",
+    "cordova-plugin-advanced-http": "^3.3.1",
+    "cordova-plugin-android-permissions": "^1.1.5",
+    "cordova-plugin-app-exit": "^0.0.2",
+    "cordova-plugin-camera-preview": "github:cordova-plugin-camera-preview/cordova-plugin-camera-preview",
+    "cordova-plugin-clear-data": "^1.0.0",
+    "cordova-plugin-device": "^2.1.0",
+    "cordova-plugin-dialogs": "^2.0.2",
+    "cordova-plugin-enable-cleartext-traffic": "^2.1.0",
+    "cordova-plugin-file": "^7.0.0",
+    "cordova-plugin-ios-disable-bounce": "^0.0.1",
+    "cordova-plugin-keyboard": "^1.3.0",
+    "cordova-plugin-networkinterface": "^2.2.0",
+    "cordova-plugin-splashscreen": "^6.0.2",
+    "cordova-plugin-statusbar": "^3.0.0",
+    "cordova-support-android-plugin": "~2.0.4"
+  }
+}

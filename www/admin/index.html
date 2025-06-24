@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <title>STANDALONE - AGROSYS TECNOLOGIA</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->    
+    <link href="css/css2.css" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="../fonts/fontawesome/css/all.min.css" rel="stylesheet">
+    <link href="../fonts/bootstrap/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="lib/bootstrap5.0.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- JavaScript Libraries -->
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="lib/bootstrap5.0.2/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/chart/chart.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script type="text/javascript" src="../js/zlibgzip.min.js"></script>
+    <script type="text/javascript" src="../js/dexie.min.js"></script>
+    <script type="text/javascript" src="../js/db.js"></script>
+    <script type="text/javascript" src="../js/service.js"></script>
+    <script src="js/pages.js"></script>
+</head>
+
+<body>
+    <div class="modal fade" id="hourModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h6 class="modal-title" id="titlemodal">Selecione um Pedido</h6>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">  </button>
+            </div>
+            <div class="modal-body" id="page_modal">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <div class="container-xxl position-relative bg-white d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="index.html" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>STANDALONE</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="../img/user.png" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0 nmuser">Jhon Doe</h6>
+                        <span id="idlogin"></span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="javascript: vrotas('home()', 'm1')" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2 imenu" id="m1"></i>Dashboard</a>                    
+                    <a href="javascript: vrotas('sincroniza()', 'm2')" class="nav-item nav-link"><i class="fa fa-sync me-2 imenu" id="m2"></i>Sincronizar</a>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="javascript: vrotas('home')" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <form class="d-none d-md-flex ms-4">
+                    <input class="form-control border-0" type="search" id="vpalavrachave" placeholder="Buscar">
+                </form>
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img class="rounded-circle me-lg-2" src="../img/user.png" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex nmuser"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="#" class="dropdown-item">Meus Dados</a>
+                            <a href="javascript: vlimpaDados()" class="dropdown-item">Limpar Dados</a>
+                            <a href="#" class="dropdown-item">Sair</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Sale & Revenue Start -->
+            <div class="container-fluid pt-4 px-4" id="conteudo_page">
+                
+            </div>
+            <!-- Sale & Revenue End -->
+
+            <!-- Footer Start Rodapé -->
+            <div class="container-fluid pt-4 px-4 footer">
+                <div class="bg-light rounded-top p-4" style="padding: unset!important;">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center text-sm-start">
+                            &copy; <a href="https://www.agrosys.com.br" target="_blank">Agrosys Tecnologia</a>, All Right Reserved. 
+                        </div>
+                        <div class="col-12 col-sm-6 text-center text-sm-end">
+                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                            By <a href="https://www.agrosys.com.br" target="_blank">www.agrosys.com.br</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer End -->
+        </div>
+        <!-- Content End -->
+
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+</body>
+
+</html>

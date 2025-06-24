@@ -1,0 +1,486 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?l1h0mf');
+  src:  url('fonts/icomoon.eot?l1h0mf#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?l1h0mf') format('truetype'),
+    url('fonts/icomoon.woff?l1h0mf') format('woff'),
+    url('fonts/icomoon.svg?l1h0mf#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-edic-view:before {
+  content: "\e900";
+}
+.icon-edic-trash:before {
+  content: "\e901";
+}
+.icon-edic-poweroff:before {
+  content: "\e902";
+}
+.icon-edic-logout:before {
+  content: "\e903";
+}
+.icon-tasksys04:before {
+  content: "\e904";
+}
+.icon-tasksys03:before {
+  content: "\e905";
+}
+.icon-tasksys02:before {
+  content: "\e906";
+}
+.icon-tasksys01:before {
+  content: "\e907";
+}
+.icon-tasksys05:before {
+  content: "\e908";
+}
+.icon-padrao02:before {
+  content: "\e909";
+}
+.icon-padrao01:before {
+  content: "\e90a";
+}
+.icon-APP3081:before {
+  content: "\e90b";
+}
+.icon-APP3044:before {
+  content: "\e90c";
+}
+.icon-APP3082:before {
+  content: "\e90d";
+}
+.icon-APP3083:before {
+  content: "\e90e";
+}
+.icon-APP3084:before {
+  content: "\e90f";
+}
+.icon-padrao03:before {
+  content: "\e910";
+}
+.icon-padrao04:before {
+  content: "\e911";
+}
+.icon-APP3045:before {
+  content: "\e912";
+}
+.icon-APP3046:before {
+  content: "\e913";
+}
+.icon-APP3047:before {
+  content: "\e914";
+}
+.icon-APP3080:before {
+  content: "\e915";
+}
+.icon-APP3118:before {
+  content: "\e916";
+}
+.icon-APP3001:before {
+  content: "\e917";
+}
+.icon-APP3002:before {
+  content: "\e918";
+}
+.icon-edic03:before {
+  content: "\e919";
+}
+.icon-APP3004:before {
+  content: "\e91a";
+}
+.icon-APP3005:before {
+  content: "\e91b";
+}
+.icon-APP3006:before {
+  content: "\e91c";
+}
+.icon-APP3007:before {
+  content: "\e91d";
+}
+.icon-APP3008:before {
+  content: "\e91e";
+}
+.icon-APP3009:before {
+  content: "\e91f";
+}
+.icon-APP3010:before {
+  content: "\e920";
+}
+.icon-edic14:before {
+  content: "\e921";
+}
+.icon-APP3117:before {
+  content: "\e922";
+}
+.icon-APP3116:before {
+  content: "\e923";
+}
+.icon-APP3115:before {
+  content: "\e924";
+}
+.icon-APP3114:before {
+  content: "\e925";
+}
+.icon-APP3113:before {
+  content: "\e926";
+}
+.icon-APP3112:before {
+  content: "\e927";
+}
+.icon-APP3111:before {
+  content: "\e928";
+}
+.icon-APP3110:before {
+  content: "\e929";
+}
+.icon-APP3109:before {
+  content: "\e92a";
+}
+.icon-APP3108:before {
+  content: "\e92b";
+}
+.icon-APP3107:before {
+  content: "\e92c";
+}
+.icon-APP3106:before {
+  content: "\e92d";
+}
+.icon-APP3105:before {
+  content: "\e92e";
+}
+.icon-APP3104:before {
+  content: "\e92f";
+}
+.icon-APP3103:before {
+  content: "\e930";
+}
+.icon-APP3102:before {
+  content: "\e931";
+}
+.icon-APP3012:before {
+  content: "\e932";
+}
+.icon-APP3101:before {
+  content: "\e933";
+}
+.icon-APP3100:before {
+  content: "\e934";
+}
+.icon-APP3099:before {
+  content: "\e935";
+}
+.icon-APP3098:before {
+  content: "\e936";
+}
+.icon-APP3079:before {
+  content: "\e937";
+}
+.icon-APP3097:before {
+  content: "\e938";
+}
+.icon-APP3096:before {
+  content: "\e939";
+}
+.icon-APP3095:before {
+  content: "\e93a";
+}
+.icon-APP3094:before {
+  content: "\e93b";
+}
+.icon-APP3078:before {
+  content: "\e93c";
+}
+.icon-APP3013:before {
+  content: "\e93d";
+}
+.icon-APP3014:before {
+  content: "\e93e";
+}
+.icon-APP3015:before {
+  content: "\e93f";
+}
+.icon-APP3093:before {
+  content: "\e940";
+}
+.icon-uniE940:before {
+  content: "\e941";
+}
+.icon-APP3092:before {
+  content: "\e942";
+}
+.icon-APP3091:before {
+  content: "\e943";
+}
+.icon-APP3090:before {
+  content: "\e944";
+}
+.icon-APP3089:before {
+  content: "\e945";
+}
+.icon-APP3048:before {
+  content: "\e946";
+}
+.icon-APP3049:before {
+  content: "\e947";
+}
+.icon-APP3050:before {
+  content: "\e948";
+}
+.icon-APP30511:before {
+  content: "\e949";
+}
+.icon-APP3051:before {
+  content: "\e94a";
+}
+.icon-whats:before {
+  content: "\e94b";
+}
+.icon-taskysys06:before {
+  content: "\e94c";
+}
+.icon-taskysys07:before {
+  content: "\e94d";
+}
+.icon-taskysys08:before {
+  content: "\e94e";
+}
+.icon-2530:before {
+  content: "\e94f";
+}
+.icon-2531:before {
+  content: "\e950";
+}
+.icon-2532:before {
+  content: "\e951";
+}
+.icon-2533:before {
+  content: "\e952";
+}
+.icon-2534:before {
+  content: "\e953";
+}
+.icon-uniE953:before {
+  content: "\e954";
+}
+.icon-uniE954:before {
+  content: "\e955";
+}
+.icon-uniE955:before {
+  content: "\e956";
+}
+.icon-taskysys09:before {
+  content: "\e957";
+}
+.icon-taskysys10:before {
+  content: "\e958";
+}
+.icon-taskysys11:before {
+  content: "\e959";
+}
+.icon-edic12:before {
+  content: "\e95a";
+}
+.icon-edic11:before {
+  content: "\e95b";
+}
+.icon-edic10:before {
+  content: "\e95c";
+}
+.icon-edic09:before {
+  content: "\e95d";
+}
+.icon-edic08:before {
+  content: "\e95e";
+}
+.icon-edic07:before {
+  content: "\e95f";
+}
+.icon-edic06:before {
+  content: "\e960";
+}
+.icon-edic05:before {
+  content: "\e961";
+}
+.icon-edic04:before {
+  content: "\e962";
+}
+.icon-edic02:before {
+  content: "\e963";
+}
+.icon-edic01:before {
+  content: "\e964";
+}
+.icon-edic15:before {
+  content: "\e965";
+}
+.icon-refresh:before {
+  content: "\e966";
+}
+.icon-APP3018:before {
+  content: "\e967";
+}
+.icon-APP3019:before {
+  content: "\e972";
+}
+.icon-APP3021:before {
+  content: "\e974";
+}
+.icon-APP3077:before {
+  content: "\e977";
+}
+.icon-APP3076:before {
+  content: "\e978";
+}
+.icon-APP3075:before {
+  content: "\e979";
+}
+.icon-APP3074:before {
+  content: "\e97a";
+}
+.icon-APP3022:before {
+  content: "\e97b";
+}
+.icon-APP3023:before {
+  content: "\e97c";
+}
+.icon-APP3024:before {
+  content: "\e97d";
+}
+.icon-APP3073:before {
+  content: "\e97e";
+}
+.icon-APP3072:before {
+  content: "\e97f";
+}
+.icon-APP3071:before {
+  content: "\e980";
+}
+.icon-APP3025:before {
+  content: "\e981";
+}
+.icon-APP3026:before {
+  content: "\e982";
+}
+.icon-APP3070:before {
+  content: "\e983";
+}
+.icon-APP3069:before {
+  content: "\e98a";
+}
+.icon-APP3027:before {
+  content: "\e98b";
+}
+.icon-APP3068:before {
+  content: "\e98c";
+}
+.icon-APP3028:before {
+  content: "\e98f";
+}
+.icon-APP3029:before {
+  content: "\e990";
+}
+.icon-APP3030:before {
+  content: "\e993";
+}
+.icon-APP3031:before {
+  content: "\e994";
+}
+.icon-APP3032:before {
+  content: "\e995";
+}
+.icon-APP3033:before {
+  content: "\e996";
+}
+.icon-APP3034:before {
+  content: "\e997";
+}
+.icon-APP3035:before {
+  content: "\e99c";
+}
+.icon-APP3036:before {
+  content: "\e99d";
+}
+.icon-APP3037:before {
+  content: "\e99e";
+}
+.icon-APP3038:before {
+  content: "\e99f";
+}
+.icon-resumoromaneio:before {
+  content: "\e9a1";
+}
+.icon-APP3066:before {
+  content: "\e9a8";
+}
+.icon-APP3065:before {
+  content: "\e9ad";
+}
+.icon-APP3039:before {
+  content: "\e9ae";
+}
+.icon-APP3063:before {
+  content: "\e9b3";
+}
+.icon-APP3040:before {
+  content: "\e9b4";
+}
+.icon-APP3041:before {
+  content: "\e9b5";
+}
+.icon-APP3042:before {
+  content: "\e9b6";
+}
+.icon-APP3043:before {
+  content: "\e9b7";
+}
+.icon-APP3064:before {
+  content: "\e9bd";
+}
+.icon-APP3062:before {
+  content: "\e9be";
+}
+.icon-APP3061:before {
+  content: "\e9bf";
+}
+.icon-APP3060:before {
+  content: "\e9c0";
+}
+.icon-APP3059:before {
+  content: "\e9c1";
+}
+.icon-APP3057:before {
+  content: "\e9c2";
+}
+.icon-APP3058:before {
+  content: "\e9c3";
+}
+.icon-APP3056:before {
+  content: "\e9c9";
+}
+.icon-APP3055:before {
+  content: "\e9cf";
+}
+.icon-APP3053:before {
+  content: "\e9d0";
+}
+.icon-APP3054:before {
+  content: "\e9d1";
+}
