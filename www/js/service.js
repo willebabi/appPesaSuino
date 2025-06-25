@@ -2,25 +2,41 @@ var vurle = localStorage.getItem('APPenderExterno');
 var vurli = localStorage.getItem('APPenderInterno');
 var vsinc = null;
 var vurlvalida = null;
-var vprograma = "webpro/weball/wsn200s1";
+var vprograma = "webpro/webpost/wsn200s1";
 
 async function validaUrl (vurl) {
-  await cordova.plugin.http.get(vurl,
-                            {},
-                            {'ContentType': 'text/plain; charset=iso-8859-1'},
-    function (vresult) {
-      if (vurl.substr(vurl.length - 1,vurl.length) == "/")
-        vurlvalida = vurl;
-      else
-        vurlvalida = vurl + "/";               
-    }, 
-    function(er){
-      if (vsinc == null) {
-        vsinc = 'E';
-        validaUrl(vurle);
+  // Retorne uma nova Promise para encapsular a chamada baseada em callback
+  return new Promise((resolve, reject) => { //
+    cordova.plugin.http.get(vurl,
+                              {},
+                              {'ContentType': 'text/plain; charset=iso-8859-1'},
+      function (vresult) { // Callback de sucesso
+        if (vurl.substr(vurl.length - 1,vurl.length) == "/") {
+          vurlvalida = vurl;
+        } else {
+          vurlvalida = vurl + "/";               
+        }
+        resolve(); // Resolve a Promise quando a URL é validada com sucesso
+      }, 
+      function(er) { // Callback de erro
+        if (vsinc == null) {
+          vsinc = 'E';
+          // Chamada recursiva para validaUrl(vurle)
+          // É importante que esta chamada TAMBÉM seja aguardada
+          // ou que seu erro seja propagado.
+          // Para simplificar, vou assumir que você quer resolver/rejeitar esta Promise
+          // dependendo do resultado da chamada externa.
+          // Se vsinc = 'E' significa que houve um erro interno, talvez seja melhor rejeitar.
+          validaUrl(vurle)
+            .then(() => resolve()) // Se a URL externa validar, resolva esta
+            .catch((innerError) => reject(innerError)); // Se a externa falhar, rejeite esta
+        } else {
+          // Se já houve uma tentativa e falhou, rejeite esta Promise
+          reject(er); //
+        }
       }
-    }
-  );
+    );
+  });
 }
 
 async function descomprime(strdata) {
@@ -47,43 +63,59 @@ async function descomprime(strdata) {
 }
 
 async function getDados (vobj) {
-  await validaUrl(vurli);
-  //debugger;
-  console.log(vurlvalida);
-  const params = new URLSearchParams(vobj.params);
-  const paramObject = Object.fromEntries(params.entries());
+  try {
+    await validaUrl(vurli); // Esta linha agora realmente esperará a validação
+    console.log(vurlvalida);
+    const params = new URLSearchParams(vobj.params);
+    const paramObject = Object.fromEntries(params.entries());
 
-  await cordova.plugin.http.post(
-    vurlvalida + vprograma, 
-    paramObject,
-    {'ContentType': vobj.dataType},
-    (vresult) => {
-      try {
-        if (vobj.buscabase) {
-          vobj.exec(vresult);
-        } else {
-          console.log(typeof vresult);
-          vresult = descomprime(vresult);
-          if (typeof vresult == 'string') {
-            vretorno = JSON.parse(vresult);
-          } else {
-            vretorno = vresult;
-          }
-          
-          vobj.exec(vretorno);
-        }
-      } catch (e) {
-        console.log(e);
-        vobj.exec({status: 0, msg: "Erro no ajax no retorno dos dados (" + vresult + ")"});
-        load.hide();
-      }
-    },
-    function(error){
-      msg("E","Ocorreram problemas ao realizar acesso. Verifique sua conexão e tente novamente!");        
-      vobj.exec({status: 0, msg: "Erro no ajax (" + error + ")"});
-      load.hide();
-    }
-  );
+    // ... restante do seu código para cordova.plugin.http.post ...
+    await new Promise((resolve, reject) => { // Promisificando a chamada post também
+        cordova.plugin.http.post(
+            vurlvalida + vprograma, 
+            paramObject,
+            {'ContentType': vobj.dataType},
+            (vresult) => { // Callback de sucesso
+                try {
+                    if (!vresult.dados)
+                      vresult.dados = vresult.data;
+
+                    if (vobj.buscabase) {
+                        vobj.exec(vresult);
+                    } else {
+                        console.log(typeof vresult);
+                        vresult = descomprime(vresult); // descomprime is async, you should await it if needed
+                        if (typeof vresult == 'string') {
+                            vretorno = JSON.parse(vresult);
+                        } else {
+                            vretorno = vresult;
+                        }
+                        vobj.exec(vretorno);
+                    }
+                    resolve(); // Resolve a Promise para o post
+                } catch (e) {
+                    console.log(e);
+                    vobj.exec({status: 0, msg: "Erro no ajax no retorno dos dados (" + vresult + ")"});
+                    load.hide();
+                    reject(e); // Rejeita em caso de erro no processamento do sucesso
+                }
+            },
+            function(error){ // Callback de erro
+                msg("E","Ocorreram problemas ao realizar acesso. Verifique sua conexão e tente novamente!");        
+                vobj.exec({status: 0, msg: "Erro no ajax (" + error + ")"});
+                load.hide();
+                reject(error); // Rejeita em caso de erro na requisição
+            }
+        );
+    });
+
+  } catch (error) {
+    // Lide com erros de validaUrl ou cordova.plugin.http.post aqui
+    console.error("Erro em getDados:", error);
+    msg("E","Ocorreram problemas na validação da URL ou na requisição de dados.");
+    vobj.exec({status: 0, msg: "Erro geral na operação (" + error + ")"});
+    load.hide();
+  }
 }
 
 //{type: "POST", params: "vusu=teste&vteste=weweew", dataType: "html", exec: (vretorno) => {} }

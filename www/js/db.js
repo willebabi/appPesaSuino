@@ -7,15 +7,15 @@ async function buscaBase (vtp) {
         if (localStorage.getItem("APPbaseSessao") == null) {
             load.show("Aguarde... Buscando base de dados");
             getDados({type: "POST"
-                ,params: `class=wpf200ln5&method=setDataBase&basenova=true`
+                ,params: `class=wsn200ln&method=setDataBase&basenova=true`
                 ,buscabase: true
                 ,dataType: "html"
                 ,exec: (vretorno) => {
                     console.log(vretorno);
                     if (vretorno.dados != "") {
                         try {
-                            eval(vretorno);
-                            localStorage.setItem('APPbaseSessao',vretorno);
+                            eval(vretorno.dados);
+                            localStorage.setItem('APPbaseSessao',vretorno.dados);
                             load.hide();
                         } catch (e) {
                             console.log(e);
