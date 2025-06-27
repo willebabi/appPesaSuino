@@ -7,6 +7,7 @@ var vprograma = "webpro/webpost/wsn200s1";
 async function validaUrl (vurl) {
   // Retorne uma nova Promise para encapsular a chamada baseada em callback
   return new Promise((resolve, reject) => { //
+    cordova.plugin.http.setRequestTimeout(20);
     cordova.plugin.http.get(vurl,
                               {},
                               {'ContentType': 'text/plain; charset=iso-8859-1'},
@@ -27,10 +28,12 @@ async function validaUrl (vurl) {
           // Para simplificar, vou assumir que você quer resolver/rejeitar esta Promise
           // dependendo do resultado da chamada externa.
           // Se vsinc = 'E' significa que houve um erro interno, talvez seja melhor rejeitar.
+          vsinc = null;
           validaUrl(vurle)
             .then(() => resolve()) // Se a URL externa validar, resolva esta
             .catch((innerError) => reject(innerError)); // Se a externa falhar, rejeite esta
         } else {
+          vsinc = null;
           // Se já houve uma tentativa e falhou, rejeite esta Promise
           reject(er); //
         }
@@ -39,7 +42,7 @@ async function validaUrl (vurl) {
   });
 }
 
-async function descomprime(strdata) {
+function descomprime(strdata) {
   try {
     if (strdata.substring(0,6) == "[COMP]") {
       const str = `${strdata}`.replace('[COMP]', '');
@@ -71,11 +74,12 @@ async function getDados (vobj) {
 
     // ... restante do seu código para cordova.plugin.http.post ...
     await new Promise((resolve, reject) => { // Promisificando a chamada post também
+        cordova.plugin.http.setRequestTimeout(20);
         cordova.plugin.http.post(
             vurlvalida + vprograma, 
             paramObject,
             {'ContentType': vobj.dataType},
-            (vresult) => { // Callback de sucesso
+            function (vresult) { // Callback de sucesso
                 try {
                     if (!vresult.dados)
                       vresult.dados = vresult.data;
@@ -83,8 +87,8 @@ async function getDados (vobj) {
                     if (vobj.buscabase) {
                         vobj.exec(vresult);
                     } else {
-                        console.log(typeof vresult);
-                        vresult = descomprime(vresult); // descomprime is async, you should await it if needed
+                        console.log(typeof vresult.data);
+                        vresult = descomprime(vresult.data); // descomprime is async, you should await it if needed
                         if (typeof vresult == 'string') {
                             vretorno = JSON.parse(vresult);
                         } else {

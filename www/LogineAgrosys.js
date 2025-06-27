@@ -62,7 +62,7 @@ async function fkillSessao(){
             window.location.replace('./admin/index.html');
         } else {
             getDados({type: "POST"
-                    ,params: `class=wpf200ln5&method=getPfidpalm&vusuario=${getValue("#vusuario")}&vsenha=${getValue("#vsenha")}`
+                    ,params: `class=wsn200ln&method=getPfidpalm&vusuario=${getValue("#vusuario")}&vsenha=${getValue("#vsenha")}`
                     ,dataType: "html"
                     ,exec: async (vretorno) => {
                         console.log(vretorno);
