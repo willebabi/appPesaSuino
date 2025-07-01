@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="utf-8">
-    <title>STANDALONE - AGROSYS TECNOLOGIA</title>
+    <title>Pesagem de Suínos - AGROSYS TECNOLOGIA</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
 
+    <script type="text/javascript" src="../cordova.js"></script>
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
 
@@ -24,10 +25,10 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="lib/bootstrap5.0.2/css/bootstrap.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" type="text/css" href="../plugins/snackbar/snackbar.min.css">
+    <link rel="stylesheet" type="text/css" href="../plugins/sweetalert/sweetalert2.min.css">
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
-
     <!-- JavaScript Libraries -->
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="lib/bootstrap5.0.2/js/bootstrap.bundle.min.js"></script>
@@ -90,8 +91,9 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="javascript: vrotas('home()', 'm1')" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2 imenu" id="m1"></i>Dashboard</a>                    
-                    <a href="javascript: vrotas('sincroniza()', 'm2')" class="nav-item nav-link"><i class="fa fa-sync me-2 imenu" id="m2"></i>Sincronizar</a>
+                    <a href="javascript: vrotas('home()', 'm1')" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-1 imenu" id="m1"></i>Iniciar Pesagem</a>
+                    <a href="javascript: vrotas('home()', 'm2')" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2 imenu" id="m2"></i>Listar Pesagens</a>                    
+                    <a href="javascript: vrotas('sincroniza()', 'm3')" class="nav-item nav-link"><i class="fa fa-sync me-3 imenu" id="m3"></i>Sincronizar</a>
                 </div>
             </nav>
         </div>
@@ -130,32 +132,31 @@
             <!-- Navbar End -->
 
             <!-- Sale & Revenue Start -->
-            <div class="container-fluid pt-4 px-4" id="conteudo_page">
+            <div class="container-fluid pt-2 px-3" id="conteudo_page">
                 
             </div>
             <!-- Sale & Revenue End -->
 
             <!-- Footer Start Rodapé -->
-            <div class="container-fluid pt-4 px-4 footer">
+            <!--div class="container-fluid pt-4 px-4 footer">
                 <div class="bg-light rounded-top p-4" style="padding: unset!important;">
                     <div class="row">
                         <div class="col-12 col-sm-6 text-center text-sm-start">
                             &copy; <a href="https://www.agrosys.com.br" target="_blank">Agrosys Tecnologia</a>, All Right Reserved. 
                         </div>
                         <div class="col-12 col-sm-6 text-center text-sm-end">
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
                             By <a href="https://www.agrosys.com.br" target="_blank">www.agrosys.com.br</a>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div-->
             <!-- Footer End -->
         </div>
         <!-- Content End -->
 
 
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+        <!-- Back to Top --
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a-->
     </div>
 
     <!-- Template Javascript -->

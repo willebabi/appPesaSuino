@@ -289,3 +289,73 @@
     width: calc(100vw - 20px)!important;
     height: calc(100vh - 20px)!important;
 }
+
+.form-floating>.form-control {
+    padding: 1.2rem 0.75rem 0.1rem !important;
+}
+
+.form-floating>label {
+    padding: 0.5rem 0.75rem 0px!important;
+}
+
+.form-floating>.form-control, .form-floating>.form-select {
+    height: unset!important;
+    line-height: 1;
+}
+
+.table>:not(caption)>*>* {
+    padding: unset!important;
+}
+
+.disableButton{
+    display: none !important;
+}
+
+.line {
+    text-decoration: line-through;
+}
+
+.select2-container .select2-selection--single{
+    height: 40px !important;
+}
+
+/* ------------------ */
+
+
+.custom-file-wrapper {
+    display: flex;
+    align-items: center;
+    border: 2px solid #a5a5a5;
+    border-radius: 5px;
+    padding: 8px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+#formFile {
+    display: none; /* Esconde o input padrão */
+}
+
+#fileLabel {
+    flex: 1;
+    padding: 5px 10px;
+    color: #555;
+}
+
+#customFileBtn {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#customFileBtn:hover {
+    background-color: #0056b3;
+    transition: 0.2s;
+}
+
+#msg_alert {
+    font-size: small;
+}

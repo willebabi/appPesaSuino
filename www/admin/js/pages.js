@@ -1,12 +1,11 @@
-var vtb = [{"tab":"pfidpalm","desc": "Buscar Dados usuários","paramurl":"class=wpf200ln5&method=getPfidpalm"},
-    {"tab":"romaneio","desc": "Buscar Dados romaneio","paramurl":"class=wpf200ln5&method=getRomaneio&tipo=romaneio&dias=0", clear: true},
-    {"tab":"pedido","desc": "Buscar Dados pedidos","paramurl":"class=wpf200ln5&method=getPedidos&tipo=pedido&dias=0", clear: true},
-    {"tab":"pedidoitem","desc": "Buscar Dados itens dos pedidos","paramurl":"class=wpf200ln5&method=getPedidos&tipo=pedidoitem&dias=0", clear: true},
-    {"tab":"clifor","desc": "Buscar Dados produtor e clientes","paramurl":"class=wpf200ln5&method=getPessoas", clear: true},
-    {"tab":"item","desc": "Buscar Itens dos pedidos","paramurl":"class=wpf200ln5&method=getPedidos&tipo=item", clear: true},
-    {"tab":"galpprod","desc": "Buscar Dados galpão","paramurl":"class=wpf200ln5&method=getDadosLotes&tipo=galpprod", clear: true},
-    {"tab":"prodaves","desc": "Buscar Dados lotes","paramurl":"class=wpf200ln5&method=getDadosLotes&tipo=lotes", clear: true},
-    {"tab":"hispsexp","desc": "Buscar Dados já pesados","paramurl":"class=wpf200ln5&method=getRomaneio&tipo=hispsexp", clear: true}];
+var vtb = [{"tab":"pfidpalm","desc": "Buscar Dados usuários","paramurl":"class=wsn200ln&method=getPfidpalm", clear: true},
+    {"tab":"clifor","desc": "Buscar Dados Produtores","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
+    {"tab":"tprodsui","desc": "Buscar Dados tipos de Criação","paramurl":"class=wsn200ln&method=getTprodsui", clear: true},
+    {"tab":"tprodcli","desc": "Buscar Dados itens Produtores e criação","paramurl":"class=wsn200ln&method=getTprodcli", clear: true}]; /*,
+    {"tab":"supesocapa","desc": "Buscar Dados produtor e clientes","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
+    {"tab":"supesoitem","desc": "Buscar Itens dos pedidos","paramurl":"class=wsn200ln&method=getPedidos&tipo=item", clear: true}];
+*/
+    //pfidpalm,tp_clifor,tprodsui,tprodcli,supesocapa,supesoitem
 
 var vpedidoselecao = null;
 
@@ -48,144 +47,66 @@ var vconteudo = $("#conteudo_page");
 /*---- inicio Page Home Dashboard ----*/
 var home = async () => {
     spinner(1);
-
-    var vnumrom    = await getCount('romaneio');
-    var vnumpedido = await getCount('pedido');
-    var vqtpedidos = await getSomaCampos('pedidoitem',null,{pit_qtpedi:0, pit_pspedi: 0, pit_qtatendi:0, pit_psatendi: 0});
-    
     vpesquisa(1);
 
-    var vcont = `
-    <div class="row g-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-line fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Romaneios</p>
-                    <h6 class="mb-0" id="numrom">${vnumrom}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-bar fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Pedidos</p>
-                    <h6 class="mb-0" id="numped">${vnumpedido}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-area fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Qtd Pedido</p>
-                    <h6 class="mb-0" id="qtdped">${vqtpedidos['pit_qtpedi']}</h6>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                <i class="fa fa-chart-pie fa-3x text-primary"></i>
-                <div class="ms-3">
-                    <p class="mb-2">Peso Pedido</p>
-                    <h6 class="mb-0" id="psped">${numberFormat(vqtpedidos['pit_pspedi'],2)}</h6>
-                </div>
-            </div>
-        </div>        
-    </div>
-    `;
-
-    /*=== Quantidade pedida ===*/
-    var vqtdp = (vped) => {
-        var vqtd = 0;
-        for (var vpi in vped.itens) {
-            vqtd += vped.itens[vpi].pit_qtpedi;
-        }
-        return vqtd;
-    };
-
-    /*=== Aqui separa os pedidos por cliente ===*/
-    var vclis = [];
-    var varr = await db._allTables['pedido'].orderBy('ped_entrega').toArray();
-
-    for (var vo in varr) {
-        var vdados = varr[vo];
-        var vret = vclis.find(ve => ve.cli_codigo == vdados.cli_codigo);
-        var vcli = await getReg('clifor', {cli_codigo: vdados.cli_codigo});
-        var vites = await db._allTables['pedidoitem'].where({emp_empresa: vdados.emp_empresa
-                                                            ,uni_unidade: vdados.uni_unidade
-                                                            ,ped_codigo: vdados.ped_codigo}).toArray();
-
-        vdados.itens = vites;
-
-        if (!vret) {
-            vdados.vnump = 1;
-            vdados.cli_nome = vcli.cli_razsoc;
-            vdados.peds = [vdados];
-            vclis.push(vdados);
-        } else {
-            vret.vnump += 1;
-            vret.peds.push(vdados);
-        }
-    }
-    //console.log(vclis);
-
-    vcont += `
+    let vcont = `
     <!-- Recent Sales Start -->
     <div class="row pt-2 px-2">
-        <div class="bg-light rounded h-100 p-4">
-            <h6 class="mb-4">Cliente e Pedidos</h6>
+        <div class="bg-light rounded h-100 p-2">
+            <h6 class="mb-4">Tipos de Produção</h6>
             <div class="accordion accordion-flush" id="accordionFlushExample">`;
 
-    for (var vi in vclis) {
-        vcont += `<div class="accordion-item">
+    let vtipo = await db._allTables['tprodsui'].orderBy('tps_codigo').toArray();
+
+    for (let vi in vtipo) { 
+        let vclidors = await db._allTables['clifor'].where({tps_codigo: vtipo[vi].tps_codigo}).toArray();
+
+        let vnump = vclidors.length;
+
+        if (vnump == 0)
+            continue;
+
+        vcont += `<div class="accordion-item p-2">
                     <h2 class="accordion-header" id="flush-headingOne">
-                        <div class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#flush-collapseOne${vclis[vi].ped_codigo}"
-                            aria-expanded="true" aria-controls="flush-collapseOne${vclis[vi].ped_codigo}">
-                            ${vclis[vi].cli_nome} - Num.Pedidos: ${vclis[vi].vnump}
+                        <div class="accordion-button collapsed p-2" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#flush-collapseOne${vtipo[vi].tps_codigo}"
+                            aria-expanded="true" aria-controls="flush-collapseOne${vtipo[vi].tps_codigo}">
+                            ${vtipo[vi].tps_descr}
                         </div>
                     </h2>
-                    <div id="flush-collapseOne${vclis[vi].ped_codigo}" class="accordion-collapse collapse"
+                    <div id="flush-collapseOne${vtipo[vi].tps_codigo}" class="accordion-collapse collapse"
                         aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                        <div class="accordion-body">
-                            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <div class="accordion-body p-2">
+                            <table class="table text-start align-middle table-bordered table-hover mb-0 p-0">
                                 <thead>
                                     <tr class="text-dark">
-                                        <th scope="col">Empresa</th>
-                                        <th scope="col">Unidade</th>
-                                        <th scope="col">Pedido</th>
-                                        <th scope="col">Romaneio</th>
-                                        <th scope="col">Emissão</th>
-                                        <th scope="col">Entrega</th>
-                                        <th scope="col">Qtde Pedido</th>
+                                        <th scope="col">Produtor</th>
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
-                                <tbody>`;
-        for (var vpes in vclis[vi].peds) {
-            var vstr = stringify(vclis[vi].peds[vpes]);
-            
-            vcont += `<tr>
-                        <td>${vclis[vi].peds[vpes].emp_empresa}</td>
-                        <td>${vclis[vi].peds[vpes].uni_unidade}</td>
-                        <td>${vclis[vi].peds[vpes].ped_codigo}</td>
-                        <td>${vclis[vi].peds[vpes].rom_codigo}</td>
-                        <td>${dateFormat(vclis[vi].peds[vpes].ped_emissao)}</td>
-                        <td>${dateFormat(vclis[vi].peds[vpes].ped_entrega)}</td>
-                        <td>${vqtdp(vclis[vi].peds[vpes])}</td>
-                        <td><button type="button" class="btn btn-outline-primary m-2" onclick='lotes(` + vstr + `)'><i class="fa fa-paper-plane me-2"></i>Atender Pedido</button></td>
-                    </tr>`;
+                            <tbody>`;
+        for (let vcli in vclidors) {
+                let vstr = stringify(vclidors[vcli]);
+
+                vcont += `<tr>
+                            <td>${vclidors[vcli].cli_codigo} - ${vclidors[vcli].cli_fantasi}</td> 
+                            <td>
+                                <div style="display: flex; flex-direction: column;">
+                                    <button type="button" class="btn btn-outline-primary m-2" onclick='iniciaPesagem(${vstr})'>
+                                        <i class="fa fa-paper-plane me-2"></i>
+                                        Pesar
+                                    </button>
+                                <div>
+                            <td>
+                        </tr>`;
         }
 
         vcont += `</tbody>
-                            </table>
+                          </table>
                         </div>
                     </div>
                 </div>`;
     }
-
     vcont += `
             </div>
         </div>
@@ -200,6 +121,107 @@ var home = async () => {
     return false;
 };
 /*---- final Page Home Dashboard ----*/
+
+/*---- Form de pesagem incial ----*/
+async function iniciaPesagem (vprodutor){
+    $(document).ready(async function() {
+        $('.js-example-basic-single').select2();
+
+        var vdados_clifor = await db._allTables['clifor'].orderBy('cli_codigo').toArray();  
+
+        vdados_clifor.forEach(async function(clifor){
+            var element = document.createElement("option")
+            element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc
+            $('#id_cliente').append(element);
+        });
+
+        for(let vo in vdados_clifor){
+            let vdados_produtor = await getBuscaDados('prodaves', {cli_codigo: vdados_clifor[vo].cli_codigo});
+
+            for(let vi in vdados_produtor){
+                var element = document.createElement("option")
+                element.innerText = vdados_produtor[vi].cli_codigo + " - " + vdados_clifor[vo].cli_fantasi + " - " +
+                                    vdados_produtor[vi].gpp_codigo + "/"   + vdados_produtor[vi].gpp_lote
+                $('#id_granja').append(element);
+            }
+        }
+    });
+    
+   let vform = `
+    <div class= "container d-flex align-items-center justify-content-center">
+        <div class="col-sm ">
+            <div style="padding-left: 25rem"> 
+                <h5> Iniciar a Pesagem na origem: ${vprodutor.cli_fantasi} </h5>
+            </div>
+            <div class="bg-light rounded h-100 p-5 mt-5">
+                <div class="centralize-pad" style="padding-left: 15rem">   <!--  style="padding-left: 15rem" -->
+                    <div class="row row-cols-2">
+                        <div class="col form-floating mb-2">
+                            <select class="js-example-basic-single form-select" name="cliente" id="id_cliente">
+                                <option selected></option>
+                            </select>
+                            <label for="id_granja">Cliente:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-4">
+                        <div class="col form-floating mb-2">
+                            <input type="text" class="form-control" id="id_placa">
+                            <label for="peso_min">Placa:</label>
+                        </div>
+                        <div class="col form-floating mb-2">
+                            <input type="number" step="any" class="form-control" id="peso_venda">
+                            <label for="peso_min">Peso Venda:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-2">
+                        <div class="col form-floating mb-2">
+                            <select class="js-example-basic-single form-select" name="granja" id="id_granja" onchange="adicionarGalpaoELote()">
+                                <option selected></option>
+                            </select>
+                            <label for="id_granja">Granja:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-4">
+                        <div class="col form-floating mb-2">
+                            <input type="text" class="form-control" id="id_galpao" disabled>
+                            <label for="peso_min">Galpão:</label>
+                        </div>
+                        <div class="col form-floating mb-2">
+                            <input type="text" class="form-control" id="id_lote" disabled>
+                            <label for="peso_min">Lote:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-4">
+                        <div class="col form-floating mb-2">
+                            <select class="form-select" id="tipo_ave">
+                                <option selected></option>
+                                <option value="1">Frango</option>
+                                <option value="2">Refugo</option>
+                                <option value="3">Galeto</option>
+                                <option value="4">Matriz</option>
+                            </select>
+                            <label for="tipo_ave">Tipo de Ave:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-4">
+                        <div class="col form-floating mb-2">
+                            <input type="number" value="6" class="form-control" id="id_qtaves">
+                            <label for="peso_min">Qtaves P/C:</label>
+                        </div>
+                        <div class="col form-floating mb-2">
+                            <input type="number" step="any" class="form-control" id="id_pesomed">
+                            <label for="peso_min">Peso Médio</label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" onclick="criarPesagemAvulsa()">Salvar</button>
+                </div>
+            </div>
+        </div> 
+    </div>`;
+    
+    $("#conteudo_page").html(vform);
+    spinner(0);
+}
 
 /*---- inicio Page Sincronização ----*/
 var vclicksinc = async () => {
@@ -222,41 +244,18 @@ var vclicksinc = async () => {
                     case 'pfidpalm':
                         vp = await getReg(vtt, {idpalm: vdados.idpalm});
                         break;
-                    case 'romaneio':
-                        vp = await getReg(vtt, {emp_empresa: vdados.emp_empresa
-                                               ,uni_unidade: vdados.uni_unidade
-                                               ,rom_codigo: vdados.rom_codigo});
+                    case 'tprodcli':
+                        vp = await getReg(vtt, {tps_codigo_des: vdados.tps_codigo_des
+                                               ,tps_codigo_ori: vdados.tps_codigo_ori});
                         break;
-                    case 'pedido':
-                        vp = await getReg(vtt, {emp_empresa: vdados.emp_empresa
-                                               ,uni_unidade: vdados.uni_unidade
-                                               ,ped_codigo: vdados.ped_codigo});
+                    case 'tprodsui':
+                        vp = await getReg(vtt, {tps_ani: vdados.tps_ani
+                                               ,tps_codigo: vdados.tps_codigo
+                                               ,tps_tpgranja: vdados.tps_tpgranja});
                         break;
-                    case 'pedidoitem':
-                        vp = await getReg(vtt, {emp_empresa: vdados.emp_empresa
-                                               ,uni_unidade: vdados.uni_unidade
-                                               ,ped_codigo: vdados.ped_codigo
-                                               ,ite_codigo: vdados.ite_codigo
-                                               ,pit_seq: vdados.pit_seq});
-                        break;
-                    case 'clifor':
+                    case 'tp_clifor':
                         vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo});
                         break;
-                    case 'item':
-                        vp = await getReg(vtt, {ite_codigo: vdados.ite_codigo});
-                        break;
-                    case 'galpprod':
-                        vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo
-                                               ,gpp_codigo: vdados.gpp_codigo});
-                        break;
-                    case 'prodaves':
-                        vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo
-                                               ,gpp_codigo: vdados.gpp_codigo
-                                               ,gpp_lote: vdados.gpp_lote});
-                        break;
-                    /* case 'hispsexp':
-                        vp = await getReg(vtt, {emp_empresacli_codigo: vdados.cli_codigo, gpp_codigo: vdados.gpp_codigo, gpp_lote: vdados.gpp_lote});
-                        break; */
                 }
 
                 if (vp != null) {
@@ -283,7 +282,7 @@ var vclicksinc = async () => {
 
         var vsinc = async (vo) => {        
             await getDados({type: "POST"
-                ,params: vtb[vo].paramurl + "&vcomp=true&vidpalm=" + localStorage.getItem('STDAidpalm')
+                ,params: vtb[vo].paramurl + "&vcomp=true&vidpalm=" + localStorage.getItem('APPidpalm')
                 ,dataType: "html"
                 ,exec: async (vretorno) => {
                     var vdados = vretorno.resultado;
@@ -300,6 +299,8 @@ var vclicksinc = async () => {
                     }
 
                     if(vretorno.status == 1) {
+                        console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
+                        console.log(vretorno, vtb, vo);
                         $("#msg" + vtb[vo].tab).html("Sucesso!")
                         //$("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
                         $("#nrg" + vtb[vo].tab).html(vretorno.resultado[vtb[vo].tab].length);

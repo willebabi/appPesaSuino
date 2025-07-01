@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget defaultlocale="pt-BR" id="com.agrosys.apppesasuino" version="1.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Pesa Suínos</name>
+    <name>Pig Weight</name>
     <description>
         Aplicativo Pesa Suínos
     </description>
@@ -20,7 +20,7 @@
     <preference name="AndroidExtraFilesystems" value="files,files-external,documents,sdcard,cache,cache-external,assets,root" />
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="FadeSplashScreenDuration" value="300" />
-    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreen" value="splash" />
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="StatusBarBackgroundColor" value="#073751" />
@@ -39,7 +39,7 @@
         <icon density="xhdpi" src="resources/android/icon/drawable-xhdpi-icon.png" />
         <icon density="xxhdpi" src="resources/android/icon/drawable-xxhdpi-icon.png" />
         <icon density="xxxhdpi" src="resources/android/icon/drawable-xxxhdpi-icon.png" />
-        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/android/splash/splash.png" />
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="resources/splash.png" />
         <preference name="AndroidWindowSplashScreenBackground" value="#ffffff" />
         <splash density="land-ldpi" src="resources/android/splash/drawable-land-ldpi-screen.png" />
         <splash density="land-mdpi" src="resources/android/splash/drawable-land-mdpi-screen.png" />

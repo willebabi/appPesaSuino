@@ -42,10 +42,24 @@ async function validaUrl (vurl) {
   });
 }
 
+function isoToUtf8(isoString) {
+  const decoder = new TextDecoder('iso-8859-1');
+  const uint8Array = new Uint8Array(isoString.length);
+
+  for (let i = 0; i < isoString.length; i++) {
+    uint8Array[i] = isoString.charCodeAt(i);
+  }
+
+  const utf8String = decoder.decode(uint8Array);
+  return utf8String;
+}
+
 function descomprime(strdata) {
+  let vstring = strdata;
+
   try {
-    if (strdata.substring(0,6) == "[COMP]") {
-      const str = `${strdata}`.replace('[COMP]', '');
+    if (vstring.substring(0,6) == "[COMP]") {
+      const str = `${vstring}`.replace('[COMP]', '');
 
       vdata = window.atob(String(str).trim());
       const charData = vdata.split('').map((c) => c.charCodeAt(0));
@@ -53,21 +67,25 @@ function descomprime(strdata) {
       const inflate = new Zlib.Inflate(binData);
       const decoder = new TextDecoder("utf-8");
 
-      var vdescop = inflate.decompress();
-      const string = decoder.decode(new Uint8Array(vdescop));
-      return string;
+      const vdescop = inflate.decompress();
+      vstring = decoder.decode(new Uint8Array(vdescop));
+      console.log(isoToUtf8(vstring));
+      return isoToUtf8(vstring);
     } else {
-      return strdata;
+      console.log(isoToUtf8(vstring));
+      return isoToUtf8(vstring);
     }
   } catch (error) {
       console.log(error);
-      console.log(`${strdata}`);
+      console.log(`${vstring}`);
   }
 }
 
 async function getDados (vobj) {
   try {
-    await validaUrl(vurli); // Esta linha agora realmente esperará a validação
+    if (vurlvalida == null) 
+      await validaUrl(vurli); // Esta linha agora realmente esperará a validação
+    
     console.log(vurlvalida);
     const params = new URLSearchParams(vobj.params);
     const paramObject = Object.fromEntries(params.entries());
@@ -98,6 +116,7 @@ async function getDados (vobj) {
                     }
                     resolve(); // Resolve a Promise para o post
                 } catch (e) {
+                    vurlvalida = null;
                     console.log(e);
                     vobj.exec({status: 0, msg: "Erro no ajax no retorno dos dados (" + vresult + ")"});
                     load.hide();
@@ -105,7 +124,8 @@ async function getDados (vobj) {
                 }
             },
             function(error){ // Callback de erro
-                msg("E","Ocorreram problemas ao realizar acesso. Verifique sua conexão e tente novamente!");        
+                vurlvalida = null;
+                msg("E","Ocorreram problemas ao realizar acesso. Verifique sua conexão e tente novamente! " + vurlvalida);        
                 vobj.exec({status: 0, msg: "Erro no ajax (" + error + ")"});
                 load.hide();
                 reject(error); // Rejeita em caso de erro na requisição
@@ -115,6 +135,7 @@ async function getDados (vobj) {
 
   } catch (error) {
     // Lide com erros de validaUrl ou cordova.plugin.http.post aqui
+    vurlvalida = null;
     console.error("Erro em getDados:", error);
     msg("E","Ocorreram problemas na validação da URL ou na requisição de dados.");
     vobj.exec({status: 0, msg: "Erro geral na operação (" + error + ")"});
