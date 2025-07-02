@@ -125,45 +125,51 @@ var home = async () => {
 /*---- Form de pesagem incial ----*/
 async function iniciaPesagem (vprodutor){
     $(document).ready(async function() {
-        $('.js-example-basic-single').select2();
+        var vdados_tprodcli = await db._allTables['tprodcli'].where({'tps_codigo_ori': vprodutor.tps_codigo}).toArray();
 
-        var vdados_clifor = await db._allTables['clifor'].orderBy('cli_codigo').toArray();  
+        vdados_tprodcli.forEach(async function (vtprodcli) {
+            var vdados_clifor   = await db._allTables['clifor'].where({'tps_codigo': vtprodcli.tps_codigo_des}).toArray();
 
-        vdados_clifor.forEach(async function(clifor){
-            var element = document.createElement("option")
-            element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc
-            $('#id_cliente').append(element);
+            console.log(vdados_clifor);
+
+            vdados_clifor.forEach(function(clifor) {
+                var element = document.createElement("option")
+                element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc
+                $('#id_cliente').append(element);
+            });
         });
 
-        for(let vo in vdados_clifor){
-            let vdados_produtor = await getBuscaDados('prodaves', {cli_codigo: vdados_clifor[vo].cli_codigo});
-
-            for(let vi in vdados_produtor){
-                var element = document.createElement("option")
-                element.innerText = vdados_produtor[vi].cli_codigo + " - " + vdados_clifor[vo].cli_fantasi + " - " +
-                                    vdados_produtor[vi].gpp_codigo + "/"   + vdados_produtor[vi].gpp_lote
-                $('#id_granja').append(element);
-            }
-        }
+        $('.combo_cliente_dest').select2();
+        
     });
     
    let vform = `
     <div class= "container d-flex align-items-center justify-content-center">
         <div class="col-sm ">
-            <div style="padding-left: 25rem"> 
-                <h5> Iniciar a Pesagem na origem: ${vprodutor.cli_fantasi} </h5>
+            <div class="row row-cols-1">
+                <div class="row row-cols-1">
+                    <h5> Iniciar a Pesagem na origem: </h5>
+                    <h6> ${vprodutor.cli_fantasi} </h6>
+                </div>
             </div>
-            <div class="bg-light rounded h-100 p-5 mt-5">
-                <div class="centralize-pad" style="padding-left: 15rem">   <!--  style="padding-left: 15rem" -->
-                    <div class="row row-cols-2">
+            <div class="bg-light rounded h-2 p-2 mt-2">
+                <div class="centralize-pad">
+                    <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
-                            <select class="js-example-basic-single form-select" name="cliente" id="id_cliente">
-                                <option selected></option>
-                            </select>
-                            <label for="id_granja">Cliente:</label>
+                            <input type="date" class="form-control" id="data_pesagem">
+                            <label for="data_pesagem">Data da Pesagem:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-4">
+
+                    <div class="row row-cols-1">
+                        <div class="col form-floating mb-2">
+                            <select class="combo_cliente_dest form-select" name="cliente" id="id_cliente">
+                                <option selected></option>
+                            </select>
+                            <label for="id_granja">Destino:</label>
+                        </div>
+                    </div>
+                    <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
                             <input type="text" class="form-control" id="id_placa">
                             <label for="peso_min">Placa:</label>
@@ -173,15 +179,15 @@ async function iniciaPesagem (vprodutor){
                             <label for="peso_min">Peso Venda:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-2">
+                    <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
-                            <select class="js-example-basic-single form-select" name="granja" id="id_granja" onchange="adicionarGalpaoELote()">
+                            <select class="combo_cliente_dest form-select" name="granja" id="id_granja" onchange="adicionarGalpaoELote()">
                                 <option selected></option>
                             </select>
                             <label for="id_granja">Granja:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-4">
+                    <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
                             <input type="text" class="form-control" id="id_galpao" disabled>
                             <label for="peso_min">Galpão:</label>
@@ -191,7 +197,7 @@ async function iniciaPesagem (vprodutor){
                             <label for="peso_min">Lote:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-4">
+                    <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
                             <select class="form-select" id="tipo_ave">
                                 <option selected></option>
@@ -203,7 +209,7 @@ async function iniciaPesagem (vprodutor){
                             <label for="tipo_ave">Tipo de Ave:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-4">
+                    <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
                             <input type="number" value="6" class="form-control" id="id_qtaves">
                             <label for="peso_min">Qtaves P/C:</label>
@@ -220,6 +226,7 @@ async function iniciaPesagem (vprodutor){
     </div>`;
     
     $("#conteudo_page").html(vform);
+
     spinner(0);
 }
 
@@ -253,7 +260,7 @@ var vclicksinc = async () => {
                                                ,tps_codigo: vdados.tps_codigo
                                                ,tps_tpgranja: vdados.tps_tpgranja});
                         break;
-                    case 'tp_clifor':
+                    case 'clifor':
                         vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo});
                         break;
                 }
