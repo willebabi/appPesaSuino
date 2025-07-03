@@ -122,6 +122,28 @@ var home = async () => {
 };
 /*---- final Page Home Dashboard ----*/
 
+
+function calcularPesoMedio() {
+    var peso = parseFloat($("#peso").val());
+    if (isNaN(peso)) {
+        peso = 0;
+    }
+    var tara = parseFloat($("#tara").val());
+    if (isNaN(tara)) {
+        tara = 0;
+    }
+    var quantidade = parseFloat($("#quantidade").val());
+    if (isNaN(quantidade)) {
+        quantidade = 1;
+    }
+    if (!isNaN(peso) && !isNaN(tara) && !isNaN(quantidade) && quantidade > 0) {
+        var pesoMedio = (peso - tara) / quantidade;
+        $("#peso_medio").val(pesoMedio.toFixed(2));
+    } else {
+        $("#peso_medio").val("");
+    }
+}
+
 /*---- Form de pesagem incial ----*/
 async function iniciaPesagem (vprodutor){
     $(document).ready(async function() {
@@ -171,54 +193,25 @@ async function iniciaPesagem (vprodutor){
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
-                            <input type="text" class="form-control" id="id_placa">
-                            <label for="peso_min">Placa:</label>
+                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="quantidade">
+                            <label for="peso_min">Quantidade:</label>
                         </div>
                         <div class="col form-floating mb-2">
-                            <input type="number" step="any" class="form-control" id="peso_venda">
-                            <label for="peso_min">Peso Venda:</label>
-                        </div>
-                    </div>
-                    <div class="row row-cols-1">
-                        <div class="col form-floating mb-2">
-                            <select class="combo_cliente_dest form-select" name="granja" id="id_granja" onchange="adicionarGalpaoELote()">
-                                <option selected></option>
-                            </select>
-                            <label for="id_granja">Granja:</label>
+                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="peso">
+                            <label for="peso_min">Peso Balança:</label>
                         </div>
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
-                            <input type="text" class="form-control" id="id_galpao" disabled>
-                            <label for="peso_min">Galpão:</label>
+                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="tara">
+                            <label for="peso_min">Peso Tara:</label>
                         </div>
                         <div class="col form-floating mb-2">
-                            <input type="text" class="form-control" id="id_lote" disabled>
-                            <label for="peso_min">Lote:</label>
+                            <input type="number" step="any" readonly class="form-control" id="peso_medio">
+                            <label for="peso_min">Peso Médio:</label>
                         </div>
                     </div>
-                    <div class="row row-cols-1">
-                        <div class="col form-floating mb-2">
-                            <select class="form-select" id="tipo_ave">
-                                <option selected></option>
-                                <option value="1">Frango</option>
-                                <option value="2">Refugo</option>
-                                <option value="3">Galeto</option>
-                                <option value="4">Matriz</option>
-                            </select>
-                            <label for="tipo_ave">Tipo de Ave:</label>
-                        </div>
-                    </div>
-                    <div class="row row-cols-2">
-                        <div class="col form-floating mb-2">
-                            <input type="number" value="6" class="form-control" id="id_qtaves">
-                            <label for="peso_min">Qtaves P/C:</label>
-                        </div>
-                        <div class="col form-floating mb-2">
-                            <input type="number" step="any" class="form-control" id="id_pesomed">
-                            <label for="peso_min">Peso Médio</label>
-                        </div>
-                    </div>
+                    
                     <button type="button" class="btn btn-outline-primary" onclick="criarPesagemAvulsa()">Salvar</button>
                 </div>
             </div>
