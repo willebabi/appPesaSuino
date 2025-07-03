@@ -14,8 +14,12 @@
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-file": {},
-      "cordova-plugin-advanced-http": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
+      "cordova-plugin-advanced-http": {
+        "ANDROIDBLACKLISTSECURESOCKETPROTOCOLS": "SSLv3,TLSv1"
+      },
       "cordova-plugin-app-exit": {},
       "cordova-plugin-device": {},
       "cordova-plugin-dialogs": {},

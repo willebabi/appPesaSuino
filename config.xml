@@ -24,7 +24,7 @@
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="StatusBarBackgroundColor" value="#073751" />
-    <preference name="StatusBarStyle" value="lightcontent" />
+    <preference name="StatusBarStyle" value="default" />
     <platform name="android">
         <preference name="AutoHideSplashScreen" value="true" />
         <preference name="SplashShowOnlyFirstTime" value="false" />
