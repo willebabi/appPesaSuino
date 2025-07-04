@@ -161,14 +161,71 @@ function calcularPesoMedio() {
 }
 
 /*---- Form de pesagem incial ----*/
+async function listaItemPesagem() {
+    let vsup_id = parseInt($('#sup_id').val());
+
+    let vcapa = await db._allTables['supesocapa']
+                        .where('sup_id')
+                        .equals(vsup_id)
+                        .reverse()
+                        .sortBy('sup_id');
+
+    let vitems = await db._allTables['supesoitem']
+                            .where('sup_id')
+                            .equals(vsup_id)
+                            .reverse()
+                            .sortBy('sui_id');
+                            
+    let valor = [0, 0, 0]; // [qtde, peso, tara]
+    $('#lista_pesagem').html('');
+    let vcont = `<div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Seq</th>
+                            <th scope="col">Qtde</th>
+                            <th scope="col">Peso</th>
+                            <th scope="col">Tara</th>
+                            <th scope="col">Peso Mádio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabitepeso">`;
+    for (let vite in vitems) {
+        vcont += `<tr>
+                    <td>${vitems[vite].sui_id}</td>
+                    <td>${vitems[vite].sui_qtde}</td>
+                    <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
+                    <td>${vcapa[0].sup_tara}</td>
+                    <td>${vitems[vite].sui_pesototal.toFixed(2)}</td>
+                </tr>`;
+        valor[0] += parseInt(vitems[vite].sui_qtde);
+        valor[1] += parseFloat(vitems[vite].sui_pesototal);
+        valor[2] += parseInt(vcapa[0].sup_tara);
+    }
+
+    if (isNaN(valor[2])) {
+        valor[2] = '';
+    }
+
+    if (valor[0] > 0)
+        vcont += `<tr>
+                    <td></td>
+                    <td>${valor[0]}</td>
+                    <td>${(valor[1] / valor[0]).toFixed(2)}</td>
+                    <td>${valor[2]}</td>
+                    <td>${valor[1].toFixed(2)}</td>
+                </tr>`;
+
+    vcont += `</tbody></table></div>`;
+
+    $('#lista_pesagem').html(vcont);
+}
+
 async function salvarPesagem() {
     spinner(1);
 
     let vcria = true;
-    let vitem = await db._allTables['supesoitem']
-                            .orderBy('sui_id')
-                            .reverse()
-                            .first();
+    
     let maxItem = 1;
     let vcapa = await db._allTables['supesocapa']
                             .orderBy('sup_id')
@@ -179,9 +236,6 @@ async function salvarPesagem() {
     if (vcapa) {
         maxCapa = parseInt(vcapa.sup_id) + 1;
     }
-    if (vitem) {
-        maxItem = parseInt(vitem.sui_id) + 1;
-    }
 
     if (parseInt($('#sup_id').val()) > 0) {
         maxCapa = parseInt($('#sup_id').val());
@@ -189,6 +243,7 @@ async function salvarPesagem() {
         vcria = false;
     }
 
+    /*=== Cria a capa da pesagem e atualiza ===*/
     var vdados = {
         acl_nrlote: '',  
         cli_codigo_des: $('#id_cliente').val(),
@@ -221,6 +276,39 @@ async function salvarPesagem() {
             $('#peso_medio').prop('disabled', true);
         }
     }
+
+    /*=== Cria o item da pesagem e atualiza ===*/
+    vcria = true;
+    let vitem = await db._allTables['supesoitem']
+                        .where('sup_id')
+                        .equals(maxCapa)
+                        .reverse()
+                        .sortBy('sui_id');
+                            
+    if (vitem && vitem.length > 0) {
+        maxItem = parseInt(vitem[0].sui_id) + 1;
+    }
+
+    var vdados = {
+        sui_id: maxItem,
+        sui_pesototal: parseFloat($('#peso').val()),
+        sui_qtde: parseInt($('#quantidade').val()),
+        sup_id: maxCapa
+    };
+
+    if (!vcria) {
+        await db._allTables['supesoitem'].bulkUpdate([
+            {key: vitem.id, changes: vdados}
+        ]).then(() => {
+            console.log(`supesocapa update`);
+        }).catch(error => {
+            console.log(`Erro supesocapa update ` + error.name);
+        });
+    } else {
+        let vretorno = await db._allTables['supesoitem'].bulkAdd([vdados], { allKeys: true });
+    }
+
+    listaItemPesagem();
 
     spinner(0);
 }
