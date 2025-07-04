@@ -16,6 +16,18 @@ var spinner = async function (vtipo) {
         $('#spinner').removeClass('show');
 };
 
+var vdataAtual = () => {
+    const dataAtual = new Date();
+
+    const dia = String(dataAtual.getDate()).padStart(2, '0');
+    const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês é 0-indexado
+    const ano = dataAtual.getFullYear();
+
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+    console.log("Formato dd/mm/yyyy:", dataFormatada); // Ex: "03/07/2025"
+    return dataFormatada;
+};
+
 var vlimpaDados = () => {
     if (confirm('Confirma a limpeza dos dados?')) {
         spinner(1);
@@ -26,7 +38,7 @@ var vlimpaDados = () => {
         }
         spinner(0);
 
-        $("#m2").click();
+        $("#m1").click();
     }
 
     return false;
@@ -36,8 +48,11 @@ var vpesquisa = (vtipo) => {
     $("#vpalavrachave").on("keyup", function() {
         var value = $(this).val().toLowerCase();
         //console.log(this); 
-        $("#accordionFlushExample div.accordion-item ").filter(function() {                        
+        $("#accordionFlushExample div.accordion-item").filter(function() {       
             $(this).toggle( $(this).text().toLowerCase().indexOf(value) > -1 );
+            $("#accordionFlushExample div.accordion-item table tbody tr").filter(function() {
+                $(this).toggle( $(this).text().toLowerCase().indexOf(value) > -1 );
+            });
         });
     });
 };
@@ -67,11 +82,12 @@ var home = async () => {
             continue;
 
         vcont += `<div class="accordion-item p-2">
-                    <h2 class="accordion-header" id="flush-headingOne">
+                    <h2 class="accordion-header" id="flush-headingOne${vtipo[vi].tps_codigo}">
                         <div class="accordion-button collapsed p-2" type="button"
                             data-bs-toggle="collapse" data-bs-target="#flush-collapseOne${vtipo[vi].tps_codigo}"
                             aria-expanded="true" aria-controls="flush-collapseOne${vtipo[vi].tps_codigo}">
                             ${vtipo[vi].tps_descr}
+                            <input type="hidden" id="tps_codigo${vtipo[vi].tps_codigo}" value="${vnump}">
                         </div>
                     </h2>
                     <div id="flush-collapseOne${vtipo[vi].tps_codigo}" class="accordion-collapse collapse"
@@ -84,7 +100,7 @@ var home = async () => {
                                         <th scope="col"></th>
                                     </tr>
                                 </thead>
-                            <tbody>`;
+                                <tbody>`;
         for (let vcli in vclidors) {
                 let vstr = stringify(vclidors[vcli]);
 
@@ -101,7 +117,7 @@ var home = async () => {
                         </tr>`;
         }
 
-        vcont += `</tbody>
+        vcont += `          </tbody>
                           </table>
                         </div>
                     </div>
@@ -145,7 +161,80 @@ function calcularPesoMedio() {
 }
 
 /*---- Form de pesagem incial ----*/
-async function iniciaPesagem (vprodutor){
+async function salvarPesagem() {
+    spinner(1);
+
+    let vcria = true;
+    let vitem = await db._allTables['supesoitem']
+                            .orderBy('sui_id')
+                            .reverse()
+                            .first();
+    let maxItem = 1;
+    let vcapa = await db._allTables['supesocapa']
+                            .orderBy('sup_id')
+                            .reverse()
+                            .first();
+    let maxCapa = 1;
+
+    if (vcapa) {
+        maxCapa = parseInt(vcapa.sup_id) + 1;
+    }
+    if (vitem) {
+        maxItem = parseInt(vitem.sui_id) + 1;
+    }
+
+    if (parseInt($('#sup_id').val()) > 0) {
+        maxCapa = parseInt($('#sup_id').val());
+        vcapa = await db._allTables['supesocapa'].get(maxCapa);
+        vcria = false;
+    }
+
+    var vdados = {
+        acl_nrlote: '',  
+        cli_codigo_des: $('#id_cliente').val(),
+        cli_codigo_ori: $('#cli_codigo_ori').val(),
+        sup_data: $('#data_pesagem').val(),
+        sup_id: maxCapa,
+        sup_tara: $('#tara').val(),
+        sup_usado: ''
+    };
+
+    if (!vcria) {
+        await db._allTables['supesocapa'].bulkUpdate([
+            {key: vcapa.id, changes: vdados}
+        ]).then(() => {
+            console.log(`supesocapa update`);
+        }).catch(error => {
+            console.log(`Erro supesocapa update ` + error.name);
+        });
+    } else {
+        let vretorno = await db._allTables['supesocapa'].bulkAdd([vdados], { allKeys: true });
+
+        console.log(vretorno);
+        if (vretorno.length > 0) {
+            $('#sup_id').val(vretorno[0]);
+            $('.combo_cliente_dest').prop('disabled', true);
+            $('#data_pesagem').prop('disabled', true);
+            $('#quantidade').prop('disabled', false);
+            $('#peso').prop('disabled', false);
+            $('#tara').prop('disabled', true);
+            $('#peso_medio').prop('disabled', true);
+        }
+    }
+
+    spinner(0);
+}
+
+async function iniciaPesagem (vprodutor, vpesagem = null) {
+    spinner(1);
+    vpesquisa(1);
+
+    if (vpesagem == null) {
+        vpesagem = '';
+    } else {
+
+    }
+
     $(document).ready(async function() {
         var vdados_tprodcli = await db._allTables['tprodcli'].where({'tps_codigo_ori': vprodutor.tps_codigo}).toArray();
 
@@ -156,6 +245,7 @@ async function iniciaPesagem (vprodutor){
 
             vdados_clifor.forEach(function(clifor) {
                 var element = document.createElement("option")
+                element.value = clifor.cli_codigo;
                 element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc
                 $('#id_cliente').append(element);
             });
@@ -172,13 +262,15 @@ async function iniciaPesagem (vprodutor){
                 <div class="row row-cols-1">
                     <h5> Iniciar a Pesagem na origem: </h5>
                     <h6> ${vprodutor.cli_fantasi} </h6>
+                    <input type="hidden" id="cli_codigo_ori" value="${vprodutor.cli_codigo}">
                 </div>
             </div>
             <div class="bg-light rounded h-2 p-2 mt-2">
                 <div class="centralize-pad">
+                    <input type="hidden" id="sup_id" value="${vpesagem}">
                     <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
-                            <input type="date" class="form-control" id="data_pesagem">
+                            <input type="date" class="form-control" id="data_pesagem" value="${vdataAtual()}">
                             <label for="data_pesagem">Data da Pesagem:</label>
                         </div>
                     </div>
@@ -188,31 +280,33 @@ async function iniciaPesagem (vprodutor){
                             <select class="combo_cliente_dest form-select" name="cliente" id="id_cliente">
                                 <option selected></option>
                             </select>
-                            <label for="id_granja">Destino:</label>
+                            <label for="id_cliente">Destino:</label>
                         </div>
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
                             <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="quantidade">
-                            <label for="peso_min">Quantidade:</label>
+                            <label for="quantidade">Quantidade:</label>
                         </div>
                         <div class="col form-floating mb-2">
                             <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="peso">
-                            <label for="peso_min">Peso Balança:</label>
+                            <label for="peso">Peso Balança:</label>
                         </div>
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
                             <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="tara">
-                            <label for="peso_min">Peso Tara:</label>
+                            <label for="tara">Peso Tara:</label>
                         </div>
                         <div class="col form-floating mb-2">
                             <input type="number" step="any" readonly class="form-control" id="peso_medio">
-                            <label for="peso_min">Peso Médio:</label>
+                            <label for="peso_medio">Peso Médio:</label>
                         </div>
                     </div>
                     
-                    <button type="button" class="btn btn-outline-primary" onclick="criarPesagemAvulsa()">Salvar</button>
+                    <button type="button" class="btn btn-outline-primary" onclick="salvarPesagem()">Salvar</button>
+                </div>
+                <div class="centralize-pad" id="lista_pesagem">
                 </div>
             </div>
         </div> 
@@ -377,189 +471,34 @@ var sincroniza = () => {
 };
 /*---- final Page Sincronização ----*/
 
-/*---- Lista lotes em aberto ----*/
-var lotes = async (vped) => {
-    console.log(vped);
-
-    vpedidoselecao = {ped: vped};
-
-    spinner(1);
-
-    $("#titlemodal").text("Pedido: " + vped.ped_codigo + 
-                          " - Cliente: " + vped.cli_nome +
-                          " - Selecione o lote para iniciar o atendimento");
-
-    console.log($("#titlemodal").text());
-    var varr = await db._allTables['prodaves'].orderBy('pra_data').toArray();
-
-    var vcont = `
-    <table class="table text-start align-middle table-bordered table-hover mb-0">
-        <thead>
-            <tr class="text-dark">
-                <th scope="col">Produtor</th>
-                <th scope="col">Galpão</th>
-                <th scope="col">Lote</th>
-                <th scope="col">Alojamento</th>
-                <th scope="col">Aves Alojadas</th>
-                <th scope="col">Idade</th>
-                <th scope="col">Aves Caixa</th>
-                <th scope="col">Peso Med.</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-    `;
-    for (var vlt in varr) {
-        var vcli = await getReg('clifor', {cli_codigo: varr[vlt].cli_codigo});
-
-        varr[vlt].nome_produtor = varr[vlt].cli_codigo + " - " + vcli.cli_fantasi;
-
-        var vstr = stringify(varr[vlt]);
-
-        vcont += `<tr>
-                    <td>${varr[vlt].nome_produtor}</td>
-                    <td>${varr[vlt].gpp_codigo}</td>
-                    <td>${varr[vlt].gpp_lote}</td>
-                    <td>${dateFormat(varr[vlt].pra_data)}</td>
-                    <td>${numberFormat(varr[vlt].pra_qtde,0)}</td>
-                    <td>${numberFormat(getIdade(varr[vlt].pra_data),0)}</td>
-                    <td><input type="number" id="avecaixa" value="6" style="width: 100px" /></td>
-                    <td><input type="number" id="pesomed" value="" style="width: 100px" /></td>
-                    <td><button type="button" class="btn btn-outline-primary m-2" onclick='vatendimento(${vstr})'><i class="fa fa-cub me-2"></i>Iniciar</button></td>
-                </tr>`;
-    }
-
-    vcont += `</tbody>
-            </table>`;
-
-    $("#page_modal").html(vcont);
-
-    $('#hourModal').modal('show');
-
-    spinner(0);
-
-    return false;
-};
-
 var limpamenu = () => {
     $(".active").each((i, e) => {
         $(e).removeClass("active");
     });
 };
 
-var vatendimento = async (vlote) => {
-    console.log(vlote);
-
-    vpedidoselecao.lote = vlote;
-
-    spinner(1);
-
-    $("#titlemodal").text("Atendimento do Pedido: " + vpedidoselecao.ped.ped_codigo + 
-                          " - Cliente: " + vpedidoselecao.ped.cli_nome +
-                          " - Produtor: " + vlote.nome_produtor +
-                          " - Galp/Lote: " + vlote.gpp_codigo + "/" + vlote.gpp_lote);
-
-    var vform = `
-    <div class="col-sm-12 col-xl-6">
-        <div class="bg-light rounded h-100 p-4">
-            <h6 class="mb-4">Floating Label</h6>
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="floatingInput"
-                    placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="floatingPassword"
-                    placeholder="Password">
-                <label for="floatingPassword">Password</label>
-            </div>
-            <div class="form-floating mb-3">
-                <select class="form-select" id="floatingSelect"
-                    aria-label="Floating label select example">
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                </select>
-                <label for="floatingSelect">Works with selects</label>
-            </div>
-            <div class="form-floating">
-                <textarea class="form-control" placeholder="Leave a comment here"
-                    id="floatingTextarea" style="height: 150px;"></textarea>
-                <label for="floatingTextarea">Comments</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-sm-12 col-xl-6">
-        <div class="bg-light rounded h-100 p-4">
-            <h6 class="mb-4">Resumo</h6>
-        </div>
-    </div>
-    `;
-
-    var varr = await db._allTables['hispsexp'].orderBy('pes_dtprod').reverse().toArray();
-
-    var vcont = `
-    <table class="table text-start align-middle table-bordered table-hover mb-0">
-        <thead>
-            <tr class="text-dark">
-                <th scope="col">Produtor</th>
-                <th scope="col">Galpão</th>
-                <th scope="col">Lote</th>
-                <th scope="col">Alojamento</th>
-                <th scope="col">Aves Alojadas</th>
-                <th scope="col">Idade</th>
-                <th scope="col">Aves Caixa</th>
-                <th scope="col">Peso Med.</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-    `;
-    for (var vlt in varr) {
-        var vcli = await getReg('clifor', {cli_codigo: varr[vlt].cli_codigo});
-
-        vcont += `<tr>
-                    <td>${varr[vlt].cli_codigo + " - " + vcli.cli_fantasi}</td>
-                    <td>${varr[vlt].gpp_codigo}</td>
-                    <td>${varr[vlt].gpp_lote}</td>
-                    <td>${dateFormat(varr[vlt].pra_data)}</td>
-                    <td>${numberFormat(varr[vlt].pra_qtde,0)}</td>
-                    <td>${numberFormat(getIdade(varr[vlt].pra_data),0)}</td>
-                    <td><input type="number" id="avecaixa" value="6" style="width: 100px" /></td>
-                    <td><input type="number" id="pesomed" value="" style="width: 100px" /></td>
-                    <td><button type="button" class="btn btn-outline-primary m-2" onclick='vatendimento(${varr[vlt]})'><i class="fa fa-cub me-2"></i>Iniciar</button></td>
-                </tr>`;
-    }
-
-    vcont += `</tbody>
-            </table>`;
-
-    $("#page_modal").html(vform + vcont);
-
-    $('#hourModal').modal('show');
-
-    spinner(0);
-
-    return false;
-};
-
 var vrotas = (vopcao, vo) => {
     /*=== Controla active do menu ===*/
     limpamenu();
     $('#'+vo).parent().addClass("active");
+    document.querySelector('.sidebar-toggler').click();
+
+    if (vo == 'm1') {
+        $("#form_pesquisa").removeClass("d-none");
+    } else {
+        $("#form_pesquisa").addClass("d-none");
+    }
 
     $(vconteudo).html(eval(vopcao));
 }
 
 var iniHome = async () => {
-    var vnumrom    = await getCount('romaneio');
-    console.log('iniHome',vnumrom);
-    if (vnumrom > 0) {
+    var vnump    = await getCount('clifor');
+    console.log('iniHome',vnump);
+    if (vnump > 0) {
         $("#m1").click();
     } else {
         //sincroniza();
-        $("#m2").click();
+        $("#m3").click();
     }
 };
