@@ -160,6 +160,20 @@ function calcularPesoMedio() {
     }
 }
 
+async function encerrarPesagem (vobj) {
+    let vdados = {acl_nrlote: 'E'};
+
+    await db._allTables['supesocapa'].bulkUpdate([
+        {key: vobj.id, changes: vdados}
+    ]).then(() => {
+        console.log(`supesocapa update`);
+    }).catch(error => {
+        console.log(`Erro supesocapa update ` + error.name);
+    });
+
+    listaPesagens();
+}
+
 async function listaPesagens() {
     spinner(1);
     let vstatus = {'': 'Aberta', 'E': 'Encerrada', 'S': 'Sincronizada', 'C': 'Cancelada'}; 
@@ -194,11 +208,16 @@ async function listaPesagens() {
                             <p class="card-text">Data: ${vcapa[vi].sup_data} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
                             <p class="card-text">Quantidade: ${vcapa[vi].qtdes} - Peso: ${vcapa[vi].pesos}</p>
                         </div>
-                        <div class="card-footer text-body-secondary">
+                        <div class="card-footer text-body-secondary" style="${(vcapa[vi].acl_nrlote == '' ? '': 'display:none;')}">
                             <div style="display: flex; flex-direction: column;">
                                 <button type="button" class="btn btn-outline-primary m-2" onclick='iniciaPesagem(${stringify(vcapa[vi].vclio)}, ${stringify(vcapa[vi])})'>
-                                    <i class="fa fa-paper-plane me-2"></i>
+                                    <i class="fa fa-balance-scale me-2"></i>
                                     Pesar
+                                </button>
+
+                                <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vcapa[vi])})'>
+                                    <i class="fa fa-check-square-o me-2"></i>
+                                    Encerrrar
                                 </button>
                             </div>
                         </div>
