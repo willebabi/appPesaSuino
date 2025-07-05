@@ -160,6 +160,71 @@ function calcularPesoMedio() {
     }
 }
 
+async function listaPesagens() {
+    spinner(1);
+    let vstatus = {'': 'Aberta', 'E': 'Encerrada', 'S': 'Sincronizada', 'C': 'Cancelada'}; 
+    let vcapa = await db._allTables['supesocapa']
+                        .reverse()
+                        .sortBy('sup_id');
+
+    let vlinhas = "";
+    for (let vi in vcapa) {
+        let vitems = await db._allTables['supesoitem']
+                            .where('sup_id')
+                            .equals(vcapa[vi].sup_id)
+                            .reverse()
+                            .sortBy('sui_id');
+        vcapa[vi].items = vitems;
+        vcapa[vi].vclio = await db._allTables['clifor'].where('cli_codigo').equals(parseInt(vcapa[vi].cli_codigo_ori)).first();
+        vcapa[vi].vclid = await db._allTables['clifor'].where('cli_codigo').equals(parseInt(vcapa[vi].cli_codigo_des)).first();
+
+        vcapa[vi].qtdes = 0;
+        vcapa[vi].pesos = 0;
+        for (let vite in vitems) {
+            vcapa[vi].qtdes += vitems[vite].sui_qtde;
+            vcapa[vi].pesos += vitems[vite].sui_pesototal;
+        }
+        console.log(vcapa[vi]);
+        vlinhas += `<div class="card text-center" style="width: 22rem;">
+                        <div class="card-header">
+                            <h5 class="card-title"> Origem: ${vcapa[vi].vclio.cli_fantasi} </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">Destino: ${vcapa[vi].vclid.cli_fantasi}</h6>
+                            <p class="card-text">Data: ${vcapa[vi].sup_data} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
+                            <p class="card-text">Quantidade: ${vcapa[vi].qtdes} - Peso: ${vcapa[vi].pesos}</p>
+                        </div>
+                        <div class="card-footer text-body-secondary">
+                            <div style="display: flex; flex-direction: column;">
+                                <button type="button" class="btn btn-outline-primary m-2" onclick='iniciaPesagem(${stringify(vcapa[vi].vclio)}, ${stringify(vcapa[vi])})'>
+                                    <i class="fa fa-paper-plane me-2"></i>
+                                    Pesar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-light rounded h-100 p-3"></div>`;
+    }
+
+    var vcont = `
+    
+    <div class="col-12">
+        <div class="bg-light rounded h-100 p-1">
+            <h6 class="mb-4">Lista de Pesagens</h6>
+            <div class="table-responsive">
+                ${vlinhas}
+            </div>
+        </div>
+    </div>
+    `;
+    
+    $("#conteudo_page").html(vcont);
+
+    spinner(0);
+
+    return false;
+}
+
 /*---- Form de pesagem incial ----*/
 async function listaItemPesagem() {
     let vsup_id = parseInt($('#sup_id').val());
@@ -246,8 +311,8 @@ async function salvarPesagem() {
     /*=== Cria a capa da pesagem e atualiza ===*/
     var vdados = {
         acl_nrlote: '',  
-        cli_codigo_des: $('#id_cliente').val(),
-        cli_codigo_ori: $('#cli_codigo_ori').val(),
+        cli_codigo_des: parseInt($('#id_cliente').val()),
+        cli_codigo_ori: parseInt($('#cli_codigo_ori').val()),
         sup_data: $('#data_pesagem').val(),
         sup_id: maxCapa,
         sup_tara: $('#tara').val(),
@@ -315,13 +380,7 @@ async function salvarPesagem() {
 
 async function iniciaPesagem (vprodutor, vpesagem = null) {
     spinner(1);
-    vpesquisa(1);
-
-    if (vpesagem == null) {
-        vpesagem = '';
-    } else {
-
-    }
+    //vpesquisa(1);
 
     $(document).ready(async function() {
         var vdados_tprodcli = await db._allTables['tprodcli'].where({'tps_codigo_ori': vprodutor.tps_codigo}).toArray();
@@ -334,12 +393,33 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
             vdados_clifor.forEach(function(clifor) {
                 var element = document.createElement("option")
                 element.value = clifor.cli_codigo;
-                element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc
+                element.innerText = clifor.cli_codigo + " - " + clifor.cli_razsoc;
+                if (vpesagem && parseInt(vpesagem.cli_codigo_des) == clifor.cli_codigo) {
+                    element.setAttribute("selected", "selected");
+                }
+                
                 $('#id_cliente').append(element);
             });
         });
 
         $('.combo_cliente_dest').select2();
+
+        if (vpesagem !== null) {
+            console.log("Pesagem Selecionada", vpesagem);
+            $('#sup_id').val(vpesagem.id);
+            $('#cli_codigo_ori').val(vprodutor.cli_codigo);
+            $('#data_pesagem').val(vpesagem.sup_data);
+            $('#data_pesagem').prop('disabled', true);
+            $('.combo_cliente_dest').val(parseInt(vpesagem.cli_codigo_des)).trigger('change');
+            $('.combo_cliente_dest').prop('disabled', true);
+            $('#tara').val(vpesagem.sup_tara);
+            $('#tara').prop('disabled', true);
+            $('#peso_medio').prop('disabled', true);
+            $('#quantidade').prop('disabled', false);
+            $('#peso').prop('disabled', false);
+
+            listaItemPesagem();
+        }
         
     });
     
@@ -355,7 +435,7 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
             </div>
             <div class="bg-light rounded h-2 p-2 mt-2">
                 <div class="centralize-pad">
-                    <input type="hidden" id="sup_id" value="${vpesagem}">
+                    <input type="hidden" id="sup_id" value="${(vpesagem.id ? vpesagem.id : '')}">
                     <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
                             <input type="date" class="form-control" id="data_pesagem" value="${vdataAtual()}">
@@ -394,6 +474,7 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
                     
                     <button type="button" class="btn btn-outline-primary" onclick="salvarPesagem()">Salvar</button>
                 </div>
+                <div class="mb-5"></div>
                 <div class="centralize-pad" id="lista_pesagem">
                 </div>
             </div>
