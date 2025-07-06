@@ -9,6 +9,15 @@ var vtb = [{"tab":"pfidpalm","desc": "Buscar Dados usuários","paramurl":"class=
 
 var vpedidoselecao = null;
 
+var msg = (tipo, msg) => {
+    $.nok({
+        message: msg,
+        type: ((tipo == "E") ? "error" : "success"),
+        sticky: false,
+        stay: 420
+    });
+};
+
 var spinner = async function (vtipo) {
     if (vtipo == 1)
         $('#spinner').addClass('show');
@@ -278,9 +287,9 @@ async function listaItemPesagem() {
         vcont += `<tr>
                     <td>${vitems[vite].sui_id}</td>
                     <td>${vitems[vite].sui_qtde}</td>
-                    <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
-                    <td>${vcapa[0].sup_tara}</td>
                     <td>${vitems[vite].sui_pesototal.toFixed(2)}</td>
+                    <td>${vcapa[0].sup_tara}</td>
+                    <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
                 </tr>`;
         valor[0] += parseInt(vitems[vite].sui_qtde);
         valor[1] += parseFloat(vitems[vite].sui_pesototal);
@@ -295,9 +304,9 @@ async function listaItemPesagem() {
         vcont += `<tr>
                     <td></td>
                     <td>${valor[0]}</td>
-                    <td>${(valor[1] / valor[0]).toFixed(2)}</td>
-                    <td>${valor[2]}</td>
                     <td>${valor[1].toFixed(2)}</td>
+                    <td>${valor[2]}</td>
+                    <td>${(valor[1] / valor[0]).toFixed(2)}</td>
                 </tr>`;
 
     vcont += `</tbody></table></div>`;
@@ -454,7 +463,7 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
             </div>
             <div class="bg-light rounded h-2 p-2 mt-2">
                 <div class="centralize-pad">
-                    <input type="hidden" id="sup_id" value="${(vpesagem.id ? vpesagem.id : '')}">
+                    <input type="hidden" id="sup_id" value="${(vpesagem ? vpesagem.id : '')}">
                     <div class="row row-cols-1">
                         <div class="col form-floating mb-2">
                             <input type="date" class="form-control" id="data_pesagem" value="${vdataAtual()}">
@@ -492,6 +501,10 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
                     </div>
                     
                     <button type="button" class="btn btn-outline-primary" onclick="salvarPesagem()">Salvar</button>
+                    <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vpesagem)})'>
+                                    <i class="fa fa-check-square-o me-2"></i>
+                                    Encerrrar
+                                </button>
                 </div>
                 <div class="mb-5"></div>
                 <div class="centralize-pad" id="lista_pesagem">
