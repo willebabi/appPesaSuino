@@ -1,22 +1,78 @@
-var vtb = [{"tab":"pfidpalm","desc": "Buscar Dados usuários","paramurl":"class=wsn200ln&method=getPfidpalm", clear: true},
-    {"tab":"clifor","desc": "Buscar Dados Produtores","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
-    {"tab":"tprodsui","desc": "Buscar Dados tipos de Criação","paramurl":"class=wsn200ln&method=getTprodsui", clear: true},
-    {"tab":"tprodcli","desc": "Buscar Dados itens Produtores e criação","paramurl":"class=wsn200ln&method=getTprodcli", clear: true}]; /*,
-    {"tab":"supesocapa","desc": "Buscar Dados produtor e clientes","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
-    {"tab":"supesoitem","desc": "Buscar Itens dos pedidos","paramurl":"class=wsn200ln&method=getPedidos&tipo=item", clear: true}];
-*/
-    //pfidpalm,tp_clifor,tprodsui,tprodcli,supesocapa,supesoitem
+var vtb = [
+            {"tab":"supesocapa","desc": "E. Pesagens","tipo": "E","paramurl":"class=wsn200ln&method=setPesagens"},
+            {"tab":"pfidpalm","desc": "B. Dados usuários","tipo": "B","paramurl":"class=wsn200ln&method=getPfidpalm", clear: true},
+            {"tab":"clifor","desc": "B. Dados Produtores","tipo": "B","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
+            {"tab":"tprodsui","desc": "B. Tipos de Criação","tipo": "B","paramurl":"class=wsn200ln&method=getTprodsui", clear: true},
+            {"tab":"tprodcli","desc": "B. Produtores e criação","tipo": "B","paramurl":"class=wsn200ln&method=getTprodcli", clear: true}
+          ];
 
 var vpedidoselecao = null;
+let vstatus = {0: '<i class="fa fa-edit me-2" style="color: green;"></i>Aberta', 
+               1: '<i class="fa fa-check-square me-2" style="color: orange;"></i>Encerrada',
+               2: '<i class="fa fa-sync me-2" style="color: blue;"></i>Sincronizada',
+               3: '<i class="fa fa-trash me-2" style="color: red;"></i>Cancelada'};
 
-var msg = (tipo, msg) => {
-    $.nok({
-        message: msg,
-        type: ((tipo == "E") ? "error" : "success"),
-        sticky: false,
-        stay: 420
+function getValue(vnm) {
+    if ($(`#${vnm}`).length > 0) {
+        if ($(`#${vnm}`).val() !== undefined) {
+            return $(`#${vnm}`).val();
+        } else 
+            return '';
+    } else {
+        return '';
+    }
+}
+
+var vretorna_tela = '';
+
+function msgsnack(tipo, msg) {
+    var vcor = 'SteelBlue';
+    var vico = '';
+    if (tipo == 'S') {
+        vcor = 'DarkGreen';
+        vico = '<i class="fas fa-check-circle" style="color: LawnGreen;"></i> ';
+    } else if (tipo == 'E') {
+        vcor = 'DarkRed';
+        vico = '<i class="fas fa-exclamation-triangle" style="color: Yellow;"></i> ';
+    } else if (tipo == 'A') {
+        vcor = 'DarkOrange';
+        vico = '<i class="fas fa-exclamation-circle" style="color: Bisque;"></i> ';
+    }
+    Snackbar.show({
+        text: vico + msg,
+        pos: 'top-right',
+        backgroundColor: (tipo == 'S' ? 'DarkGreen' : 'DarkRed'),
+        textColor: '#FFFFFF',
+        actionText: "Ok"
     });
-};
+}
+
+async function dialogo(vtitle, vicon, voptions){
+    
+    await Swal.fire({
+        title: vtitle,
+        icon: vicon,
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Não",
+        confirmButtonText: "Sim"
+      }).then(async (result) => {
+
+        if (result.isConfirmed && voptions) {
+            await voptions.exec();
+            await Swal.fire(voptions);
+        }
+    });    
+}
+
+function dialogoPadrao(vmsg, vicon){
+    Swal.fire({
+        title: vmsg,
+        icon: vicon,
+        draggable: true
+    });
+}
 
 var spinner = async function (vtipo) {
     if (vtipo == 1)
@@ -37,18 +93,27 @@ var vdataAtual = () => {
     return dataFormatada;
 };
 
-var vlimpaDados = () => {
-    if (confirm('Confirma a limpeza dos dados?')) {
-        spinner(1);
-        for (var vo in vtb) {
-            if (vtb[vo].clear) {
-                eval(`db._allTables['${vtb[vo].tab}'].clear();`);
+var vlimpaDados = async () => {
+    let voptions = {
+        title: "Limpeza dos dados!",
+        text: "Os dados foram limpos com sucesso.",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+        exec: async function () {
+            spinner(1);
+            for (var vo in vtb) {
+                if (vtb[vo].clear) {
+                    eval(`db._allTables['${vtb[vo].tab}'].clear();`);
+                }
             }
-        }
-        spinner(0);
+            spinner(0);
 
-        $("#m1").click();
+            $("#m1").click();
+        }
     }
+
+    dialogo('Confirma a limpeza dos dados?', 'warning', voptions);
 
     return false;
 }
@@ -147,7 +212,6 @@ var home = async () => {
 };
 /*---- final Page Home Dashboard ----*/
 
-
 function calcularPesoMedio() {
     var peso = parseFloat($("#peso").val());
     if (isNaN(peso)) {
@@ -170,22 +234,38 @@ function calcularPesoMedio() {
 }
 
 async function encerrarPesagem (vobj) {
-    let vdados = {acl_nrlote: 'E'};
+    if (!vobj && getValue('sup_id') != '') {
+        vobj = {id: parseInt(getValue('sup_id'))};
+    }
 
-    await db._allTables['supesocapa'].bulkUpdate([
-        {key: vobj.id, changes: vdados}
-    ]).then(() => {
-        console.log(`supesocapa update`);
-    }).catch(error => {
-        console.log(`Erro supesocapa update ` + error.name);
-    });
+    let voptions = {
+        title: "Encerrar Pesagem!",
+        text: "Pesagem encerrada com sucesso.",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+        exec: async function () {
+            let vdados = {acl_nrlote: 1};
 
-    listaPesagens();
+            await db._allTables['supesocapa'].bulkUpdate([
+                {key: vobj.id, changes: vdados}
+            ]).then(() => {
+                console.log(`supesocapa update`);
+            }).catch(error => {
+                console.log(`Erro supesocapa update ` + error.name);
+            });
+
+            await listaPesagens();
+        }
+    }
+
+    await dialogo('Confirma o Encerramento da pesagem?', 'warning', voptions);
 }
 
 async function listaPesagens() {
     spinner(1);
-    let vstatus = {'': 'Aberta', 'E': 'Encerrada', 'S': 'Sincronizada', 'C': 'Cancelada'}; 
+    $("#form_pesquisa").addClass("d-none");
+
     let vcapa = await db._allTables['supesocapa']
                         .reverse()
                         .sortBy('sup_id');
@@ -208,17 +288,17 @@ async function listaPesagens() {
             vcapa[vi].pesos += vitems[vite].sui_pesototal;
         }
         console.log(vcapa[vi]);
-        vlinhas += `<div class="card text-center" style="width: 22rem;">
+        vlinhas += `<div class="card text-center">
                         <div class="card-header">
                             <h5 class="card-title"> Origem: ${vcapa[vi].vclio.cli_fantasi} </h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="text-align: left;">
                             <h6 class="card-title">Destino: ${vcapa[vi].vclid.cli_fantasi}</h6>
-                            <p class="card-text">Data: ${vcapa[vi].sup_data} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
-                            <p class="card-text">Quantidade: ${vcapa[vi].qtdes} - Peso: ${vcapa[vi].pesos}</p>
+                            <p class="card-text">Data: ${dateFormat(vcapa[vi].sup_data)} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
+                            <p class="card-text">Quantidade: ${vcapa[vi].qtdes} - Peso: ${vcapa[vi].pesos.toFixed(2)} - Ps.Médio: ${(vcapa[vi].pesos / vcapa[vi].qtdes).toFixed(2)}</p>
                         </div>
-                        <div class="card-footer text-body-secondary" style="${(vcapa[vi].acl_nrlote == '' ? '': 'display:none;')}">
-                            <div style="display: flex; flex-direction: column;">
+                        <div class="card-footer text-body-secondary">
+                            <div style="display: ${(vcapa[vi].acl_nrlote == 0 ? 'flex': 'none')}; flex-direction: column;">
                                 <button type="button" class="btn btn-outline-primary m-2" onclick='iniciaPesagem(${stringify(vcapa[vi].vclio)}, ${stringify(vcapa[vi])})'>
                                     <i class="fa fa-balance-scale me-2"></i>
                                     Pesar
@@ -227,6 +307,13 @@ async function listaPesagens() {
                                 <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vcapa[vi])})'>
                                     <i class="fa fa-check-square-o me-2"></i>
                                     Encerrrar
+                                </button>
+                            </div>
+
+                            <div style="display: ${(vcapa[vi].acl_nrlote == 0 ? 'none;': 'flex')}; flex-direction: column;">
+                                <button type="button" class="btn btn-outline-primary m-2" onclick='iniciaPesagem(${stringify(vcapa[vi].vclio)}, ${stringify(vcapa[vi])})'>
+                                    <i class="fa fa-eye me-2"></i>
+                                    Visualizar
                                 </button>
                             </div>
                         </div>
@@ -279,7 +366,7 @@ async function listaItemPesagem() {
                             <th scope="col">Qtde</th>
                             <th scope="col">Peso</th>
                             <th scope="col">Tara</th>
-                            <th scope="col">Peso Mádio</th>
+                            <th scope="col">Peso Médio</th>
                         </tr>
                     </thead>
                     <tbody id="tabitepeso">`;
@@ -301,7 +388,7 @@ async function listaItemPesagem() {
     }
 
     if (valor[0] > 0)
-        vcont += `<tr>
+        vcont += `<tr style="background-color: darkseagreen; color: white;">
                     <td></td>
                     <td>${valor[0]}</td>
                     <td>${valor[1].toFixed(2)}</td>
@@ -316,6 +403,42 @@ async function listaItemPesagem() {
 
 async function salvarPesagem() {
     spinner(1);
+
+    if (getValue('data_pesagem') == '') {        
+        msgsnack('E', 'Data da pesagem deve ser informada!');
+        spinner(0);
+        return false;
+    }
+
+    if (getValue('cli_codigo_ori') == '') {        
+        msgsnack('E', 'Cliente origem não encontrado !');
+        spinner(0);
+        return false;
+    }
+
+    if (getValue('id_cliente') == '') {        
+        msgsnack('E', 'Selecione o cliente de destino!');
+        spinner(0);
+        return false;
+    }
+
+    if (getValue('cli_codigo_ori') == '') {        
+        msgsnack('E', 'Cliente origem não encontrado !');
+        spinner(0);
+        return false;
+    }
+
+    if (getValue('peso') == '') {
+        msgsnack('E', 'Peso deve ser informado!');
+        spinner(0);
+        return false;
+    }
+
+    if (getValue('quantidade') == '') {
+        msgsnack('E', 'Quantidade deve ser informado!');
+        spinner(0);
+        return false;
+    }
 
     let vcria = true;
     
@@ -338,13 +461,13 @@ async function salvarPesagem() {
 
     /*=== Cria a capa da pesagem e atualiza ===*/
     var vdados = {
-        acl_nrlote: '',  
+        acl_nrlote: 0,  
         cli_codigo_des: parseInt($('#id_cliente').val()),
         cli_codigo_ori: parseInt($('#cli_codigo_ori').val()),
         sup_data: $('#data_pesagem').val(),
         sup_id: maxCapa,
         sup_tara: $('#tara').val(),
-        sup_usado: ''
+        sup_usado: false
     };
 
     if (!vcria) {
@@ -367,6 +490,7 @@ async function salvarPesagem() {
             $('#peso').prop('disabled', false);
             $('#tara').prop('disabled', true);
             $('#peso_medio').prop('disabled', true);
+            $('#btnencerra').show();
         }
     }
 
@@ -403,12 +527,14 @@ async function salvarPesagem() {
 
     listaItemPesagem();
 
+    msgsnack('S', 'Pesagem salva com sucesso!');
+
     spinner(0);
 }
 
 async function iniciaPesagem (vprodutor, vpesagem = null) {
     spinner(1);
-    //vpesquisa(1);
+    $("#form_pesquisa").addClass("d-none");
 
     $(document).ready(async function() {
         var vdados_tprodcli = await db._allTables['tprodcli'].where({'tps_codigo_ori': vprodutor.tps_codigo}).toArray();
@@ -446,6 +572,10 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
             $('#quantidade').prop('disabled', false);
             $('#peso').prop('disabled', false);
 
+            if (vpesagem.acl_nrlote == 0) {
+                $('#btnencerra').show();
+            }
+
             listaItemPesagem();
         }
         
@@ -454,10 +584,14 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
    let vform = `
     <div class= "container d-flex align-items-center justify-content-center">
         <div class="col-sm ">
-            <div class="row row-cols-1">
-                <div class="row row-cols-1">
+            <div class="row row-cols-2">
+                <div class="row row-cols-1 col-2" style="display: ${(vretorna_tela != '' ? 'flex' : 'display')}; align-self: anchor-center;" onclick="${vretorna_tela}">
+                    <i class="fa fa-chevron-left me-2"></i>
+                </div>
+
+                <div class="row row-cols-1 col-10">
                     <h5> Iniciar a Pesagem na origem: </h5>
-                    <h6> ${vprodutor.cli_fantasi} </h6>
+                    <h6> ${vprodutor.cli_fantasi} ${(vpesagem ? `(Status: ${vstatus[vpesagem.acl_nrlote]})` : ``)}</h6>
                     <input type="hidden" id="cli_codigo_ori" value="${vprodutor.cli_codigo}">
                 </div>
             </div>
@@ -499,12 +633,15 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
                             <label for="peso_medio">Peso Médio:</label>
                         </div>
                     </div>
-                    
-                    <button type="button" class="btn btn-outline-primary" onclick="salvarPesagem()">Salvar</button>
-                    <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vpesagem)})'>
-                                    <i class="fa fa-check-square-o me-2"></i>
-                                    Encerrrar
+                    ${(vpesagem && vpesagem.acl_nrlote !== 0 ? `` : `
+                                <button type="button" id="btnsalva" class="btn btn-outline-primary" onclick="salvarPesagem()">
+                                    <i class="fa fa-edit me-2"></i>
+                                    Salvar
                                 </button>
+                                <button type="button" id="btnencerra" style="display: none;" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vpesagem)})'>
+                                    <i class="fa fa-check-square me-2"></i>
+                                    Encerrrar
+                                </button>`)}
                 </div>
                 <div class="mb-5"></div>
                 <div class="centralize-pad" id="lista_pesagem">
@@ -520,105 +657,199 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
 
 /*---- inicio Page Sincronização ----*/
 var vclicksinc = async () => {
-    if (confirm("Confirma iniciar sincronização?")) {
-        spinner(1);
+    let voptions = {
+        title: "Sincronização!",
+        text: "Sincronização encerrada com sucesso.",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+        exec: async function () {
+            spinner(1);
 
-        //limpa registros ===
-        for (var vo in vtb) {
-            $("#msg" + vtb[vo].tab).html("")            
-            $("#nrg" + vtb[vo].tab).html("");
-        }
-
-        var vupbase = async (vtt, vdados) => {
-            var vp = null;
-
-            //console.log(vtt, vp, vdados);
-
-            try {
-                switch (vtt) {
-                    case 'pfidpalm':
-                        vp = await getReg(vtt, {idpalm: vdados.idpalm});
-                        break;
-                    case 'tprodcli':
-                        vp = await getReg(vtt, {tps_codigo_des: vdados.tps_codigo_des
-                                               ,tps_codigo_ori: vdados.tps_codigo_ori});
-                        break;
-                    case 'tprodsui':
-                        vp = await getReg(vtt, {tps_ani: vdados.tps_ani
-                                               ,tps_codigo: vdados.tps_codigo
-                                               ,tps_tpgranja: vdados.tps_tpgranja});
-                        break;
-                    case 'clifor':
-                        vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo});
-                        break;
-                }
-
-                if (vp != null) {
-                    await db._allTables[vtt].bulkUpdate([
-                        {key: vp.id, changes: vdados}
-                    ]).then(() => {
-                        console.log(`${vtt} update`);
-                    }).catch(error => {
-                        console.log(`Erro ${vtt} update ` + error.name);
-                    });
-                } else {
-                    await db._allTables[vtt].bulkAdd([vdados]).then(() => {
-                        console.log(`${vtt} add`);
-                    }).catch(error => {
-                        console.log(`Erro ${vtt} add ` + error.name);
-                        console.error(error);
-                    });
-                }
-            } catch (e) {
-                console.error(e);
-                console.log(vtt, vdados);
+            //limpa registros ===
+            for (var vo in vtb) {
+                $("#msg" + vtb[vo].tab).html("")            
+                $("#nrg" + vtb[vo].tab).html("");
             }
-        };
 
-        var vsinc = async (vo) => {        
-            await getDados({type: "POST"
-                ,params: vtb[vo].paramurl + "&vcomp=true&vidpalm=" + localStorage.getItem('APPidpalm')
-                ,dataType: "html"
-                ,exec: async (vretorno) => {
-                    var vdados = vretorno.resultado;
+            var vupbase = async (vtt, vdados) => {
+                var vp = null;
 
-                    try {
-                        for (var vtable in vdados) {
-                            for (var vdd in vdados[vtable]) {                            
-                                await vupbase(vtable, vdados[vtable][vdd]);
+                //console.log(vtt, vp, vdados);
+
+                try {
+                    switch (vtt) {
+                        case 'pfidpalm':
+                            vp = await getReg(vtt, {idpalm: vdados.idpalm});
+                            break;
+                        case 'tprodcli':
+                            vp = await getReg(vtt, {tps_codigo_des: vdados.tps_codigo_des
+                                                ,tps_codigo_ori: vdados.tps_codigo_ori});
+                            break;
+                        case 'tprodsui':
+                            vp = await getReg(vtt, {tps_ani: vdados.tps_ani
+                                                ,tps_codigo: vdados.tps_codigo
+                                                ,tps_tpgranja: vdados.tps_tpgranja});
+                            break;
+                        case 'clifor':
+                            vp = await getReg(vtt, {cli_codigo: vdados.cli_codigo});
+                            break;
+
+                        case 'supesocapa':
+                            vp = await getReg(vtt, {id: vdados.id});
+                            break;
+                        case 'supesoitem':
+                            vp = await getReg(vtt, {id: vdados.id});
+                            break;
+                    }
+
+                    if (vp != null) {
+                        await db._allTables[vtt].bulkUpdate([
+                            {key: vp.id, changes: vdados}
+                        ]).then(() => {
+                            console.log(`${vtt} update`);
+                        }).catch(error => {
+                            console.log(`Erro ${vtt} update ` + error.name);
+                        });
+                    } else {
+                        await db._allTables[vtt].bulkAdd([vdados]).then(() => {
+                            console.log(`${vtt} add`);
+                        }).catch(error => {
+                            console.log(`Erro ${vtt} add ` + error.name);
+                            console.error(error);
+                        });
+                    }
+                } catch (e) {
+                    console.error(e);
+                    console.log(vtt, vdados);
+                }
+            };
+
+            var vsinc = async (vo) => {
+                if (vtb[vo].tipo == 'E') {
+
+                    let vcapa = await db._allTables['supesocapa']
+                                                .where('acl_nrlote')
+                                                .equals(1)
+                                                .reverse()
+                                                .sortBy('sup_id');
+                    let vitem = [];
+
+                    for (let vcap in vcapa) {
+                        let vite = await db._allTables['supesoitem']
+                                    .where('sup_id')
+                                    .equals(vcapa[vcap].sup_id)
+                                    .reverse()
+                                    .sortBy('sui_id');
+                        vitem.push(...vite);
+                    }
+
+                    if (vcapa.length > 0) {
+                        vtb[vo].paramurl += "&supesocapa=" + btoa(JSON.stringify(vcapa))
+                                          + "&supesoitem=" + btoa(JSON.stringify(vitem));
+
+                        await getDados({type: "POST"
+                            ,params: vtb[vo].paramurl + "&vcomp=false&vidpalm=" + localStorage.getItem('APPidpalm')
+                            ,dataType: "html"
+                            ,exec: async (vretorno) => {
+                                var vdados = vretorno.resultado.params;
+
+                                try {
+                                    for (var vi in vdados) {                                        
+                                        for (var vtab in vdados[vi]) {
+                                            console.log(vtab, vdados[vi][vtab]);
+                                            for (var vdd in vdados[vi][vtab]) {
+
+                                                if (vtab == 'supesocapa') {
+                                                    vdados[vi][vtab][vdd].acl_nrlote = 2;
+                                                }
+
+                                                await vupbase(vtab, vdados[vi][vtab][vdd]);
+                                            }
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error(e);
+                                    console.log(vdados);
+                                }
+
+                                try {
+                                    if(vretorno.status == 1) {
+                                        console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
+                                        console.log(vretorno, vtb, vo);
+                                        $("#msg" + vtb[vo].tab).html("Sucesso!")
+                                        $("#nrg" + vtb[vo].tab).html("");
+                                    } else {
+                                        $("#msg" + vtb[vo].tab).html("Erro ao enviar os dados!")
+                                        $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
+                                    }
+                                } catch (e) {
+                                    $("#msg" + vtb[vo].tab).html("Erro ao enviar os dados!")
+                                    $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(e));
+                                }
+                                
+                                if (vo + 1 < vtb.length) {
+                                    await vsinc(vo + 1);
+                                } else {
+                                    spinner(0);
+                                }
+                            }
+                        });
+                    } else {
+                        $("#msg" + vtb[vo].tab).html("Sem dados para enviar!")
+                        $("#msg" + vtb[vo].tab).attr("title", "Sem dados para enviar!");
+                        await vsinc(vo + 1);
+                    }
+                } else {
+                    await getDados({type: "POST"
+                        ,params: vtb[vo].paramurl + "&vcomp=true&vidpalm=" + localStorage.getItem('APPidpalm')
+                        ,dataType: "html"
+                        ,exec: async (vretorno) => {
+                            var vdados = vretorno.resultado;
+
+                            try {
+                                for (var vtable in vdados) {
+                                    for (var vdd in vdados[vtable]) {
+                                        await vupbase(vtable, vdados[vtable][vdd]);
+                                    }
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                console.log(vdados);
+                            }
+
+                            if(vretorno.status == 1) {
+                                console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
+                                console.log(vretorno, vtb, vo);
+                                $("#msg" + vtb[vo].tab).html("Sucesso!")
+                                //$("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
+                                $("#nrg" + vtb[vo].tab).html(vretorno.resultado[vtb[vo].tab].length);
+                            } else {
+                                $("#msg" + vtb[vo].tab).html("Erro ao receber os dados!")
+                                $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
+                            }
+                            
+                            if (vo + 1 < vtb.length) {
+                                await vsinc(vo + 1);
+                            } else {
+                                spinner(0);
                             }
                         }
-                    } catch (e) {
-                        console.error(e);
-                        console.log(vdados);
-                    }
-
-                    if(vretorno.status == 1) {
-                        console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
-                        console.log(vretorno, vtb, vo);
-                        $("#msg" + vtb[vo].tab).html("Sucesso!")
-                        //$("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
-                        $("#nrg" + vtb[vo].tab).html(vretorno.resultado[vtb[vo].tab].length);
-                    } else {
-                        $("#msg" + vtb[vo].tab).html("Erro ao receber os dados!")
-                        $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
-                    }
-                    
-                    if (vo + 1 < vtb.length) {
-                        await vsinc(vo + 1);
-                    } else {
-                        spinner(0);
-                    }
+                    });
                 }
-            });
-        }
+            }
 
-        await vsinc(0);
+            await vsinc(0);
+        }
     }
+
+    await dialogo('Iniciar sincronização?', 'warning', voptions);
 };
 
 var sincroniza = () => {
     spinner(1);
+
+    $("#form_pesquisa").addClass("d-none");
 
     var vlinhas = "";
     var vi = 1;
@@ -678,17 +909,22 @@ var limpamenu = () => {
     });
 };
 
-var vrotas = (vopcao, vo) => {
+var vrotas = (vopcao, vo, vtp = null) => {
     /*=== Controla active do menu ===*/
     limpamenu();
     $('#'+vo).parent().addClass("active");
-    document.querySelector('.sidebar-toggler').click();
 
-    if (vo == 'm1') {
-        $("#form_pesquisa").removeClass("d-none");
-    } else {
-        $("#form_pesquisa").addClass("d-none");
+    if (vtp == null) {
+        document.querySelector('.sidebar-toggler').click();
+
+        if (vo == 'm1') {
+            $("#form_pesquisa").removeClass("d-none");
+        } else {
+            $("#form_pesquisa").addClass("d-none");
+        }
     }
+
+    vretorna_tela = `vrotas('${vopcao}','${vo}','return')`;
 
     $(vconteudo).html(eval(vopcao));
 }

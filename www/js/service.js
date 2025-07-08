@@ -7,7 +7,7 @@ var vprograma = "webpro/webpost/wsn200s1";
 async function validaUrl (vurl) {
   // Retorne uma nova Promise para encapsular a chamada baseada em callback
   return new Promise((resolve, reject) => { //
-    cordova.plugin.http.setRequestTimeout(20);
+    cordova.plugin.http.setRequestTimeout(10);
     cordova.plugin.http.get(vurl,
                               {},
                               {'ContentType': 'text/plain; charset=iso-8859-1'},
@@ -69,11 +69,13 @@ function descomprime(strdata) {
 
       const vdescop = inflate.decompress();
       vstring = decoder.decode(new Uint8Array(vdescop));
-      console.log(isoToUtf8(vstring));
-      return isoToUtf8(vstring);
+      //console.log(isoToUtf8(vstring));
+      //return isoToUtf8(vstring);
+      return vstring; // Retorna a string descomprimida
     } else {
-      console.log(isoToUtf8(vstring));
-      return isoToUtf8(vstring);
+      //console.log(isoToUtf8(vstring));
+      //return isoToUtf8(vstring);
+      return vstring; // Retorna a string original se não estiver comprimida
     }
   } catch (error) {
       console.log(error);
