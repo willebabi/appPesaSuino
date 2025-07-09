@@ -59,7 +59,7 @@ function descomprime(strdata) {
 
   try {
     if (vstring.substring(0,6) == "[COMP]") {
-      const str = `${vstring}`.replace('[COMP]', '');
+      const str = isoToUtf8(`${vstring}`.replace('[COMP]', ''));
 
       vdata = window.atob(String(str).trim());
       const charData = vdata.split('').map((c) => c.charCodeAt(0));
@@ -70,12 +70,12 @@ function descomprime(strdata) {
       const vdescop = inflate.decompress();
       vstring = decoder.decode(new Uint8Array(vdescop));
       //console.log(isoToUtf8(vstring));
-      //return isoToUtf8(vstring);
-      return vstring; // Retorna a string descomprimida
+      return vstring;
+      //return vstring; // Retorna a string descomprimida
     } else {
       //console.log(isoToUtf8(vstring));
-      //return isoToUtf8(vstring);
-      return vstring; // Retorna a string original se não estiver comprimida
+      return isoToUtf8(vstring);
+      //return vstring; // Retorna a string original se não estiver comprimida
     }
   } catch (error) {
       console.log(error);

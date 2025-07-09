@@ -233,19 +233,19 @@ function calcularPesoMedio() {
     }
 }
 
-async function encerrarPesagem (vobj) {
+async function encerrarPesagem (vobj, vstatus) {
     if (!vobj && getValue('sup_id') != '') {
         vobj = {id: parseInt(getValue('sup_id'))};
     }
 
     let voptions = {
-        title: "Encerrar Pesagem!",
-        text: "Pesagem encerrada com sucesso.",
+        title: (vstatus == 1 ? "Encerrar":"Cancelar") + " Pesagem!",
+        text: `Pesagem ${(vstatus == 1 ? "encerrada":"cancelada")} com sucesso.`,
         icon: "success",
         showConfirmButton: false,
         timer: 1500,
         exec: async function () {
-            let vdados = {acl_nrlote: 1};
+            let vdados = {acl_nrlote: vstatus};
 
             await db._allTables['supesocapa'].bulkUpdate([
                 {key: vobj.id, changes: vdados}
@@ -259,7 +259,7 @@ async function encerrarPesagem (vobj) {
         }
     }
 
-    await dialogo('Confirma o Encerramento da pesagem?', 'warning', voptions);
+    await dialogo(`Confirma o ${(vstatus == 1 ? "Encerramento":"Cancelamento")} da pesagem?`, 'warning', voptions);
 }
 
 async function listaPesagens() {
@@ -280,6 +280,8 @@ async function listaPesagens() {
         vcapa[vi].items = vitems;
         vcapa[vi].vclio = await db._allTables['clifor'].where('cli_codigo').equals(parseInt(vcapa[vi].cli_codigo_ori)).first();
         vcapa[vi].vclid = await db._allTables['clifor'].where('cli_codigo').equals(parseInt(vcapa[vi].cli_codigo_des)).first();
+
+        if (!vcapa[vi].vclio || !vcapa[vi].vclid) continue;
 
         vcapa[vi].qtdes = 0;
         vcapa[vi].pesos = 0;
@@ -304,9 +306,14 @@ async function listaPesagens() {
                                     Pesar
                                 </button>
 
-                                <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vcapa[vi])})'>
+                                <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vcapa[vi])},1)'>
                                     <i class="fa fa-check-square-o me-2"></i>
                                     Encerrrar
+                                </button>
+
+                                <button type="button" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vcapa[vi])},3)'>
+                                    <i class="fa fa-trash me-2"></i>
+                                    Cancelar
                                 </button>
                             </div>
 
@@ -340,6 +347,29 @@ async function listaPesagens() {
     return false;
 }
 
+async function removeItem (id) {
+    let voptions = {
+        title: "Excluir Item Pesagem!",
+        text: `Item da Pesagem excluida com sucesso.`,
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+        exec: async function () {
+            let vdados = {acl_nrlote: vstatus};
+
+            await db._allTables['supesoitem'].delete(id).then(() => {
+                console.log(`supesocapa deletado`);
+            }).catch(error => {
+                console.log(`Erro supesocapa delete ` + error.name);
+            });
+
+            await listaItemPesagem();
+        }
+    }
+
+    await dialogo(`Confirma a exclusão desse item da pesagem?`, 'warning', voptions);
+} 
+
 /*---- Form de pesagem incial ----*/
 async function listaItemPesagem() {
     let vsup_id = parseInt($('#sup_id').val());
@@ -367,6 +397,7 @@ async function listaItemPesagem() {
                             <th scope="col">Peso</th>
                             <th scope="col">Tara</th>
                             <th scope="col">Peso Médio</th>
+                            <th style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">&nbsp</th>
                         </tr>
                     </thead>
                     <tbody id="tabitepeso">`;
@@ -377,6 +408,9 @@ async function listaItemPesagem() {
                     <td>${vitems[vite].sui_pesototal.toFixed(2)}</td>
                     <td>${vcapa[0].sup_tara}</td>
                     <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
+                    <td style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">
+                        <i class="fa fa-trash" style="color:red;" onclick="removeItem(${vitems[vite].id})"></i>
+                    </td>
                 </tr>`;
         valor[0] += parseInt(vitems[vite].sui_qtde);
         valor[1] += parseFloat(vitems[vite].sui_pesototal);
@@ -394,6 +428,7 @@ async function listaItemPesagem() {
                     <td>${valor[1].toFixed(2)}</td>
                     <td>${valor[2]}</td>
                     <td>${(valor[1] / valor[0]).toFixed(2)}</td>
+                    <td style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};"></td>
                 </tr>`;
 
     vcont += `</tbody></table></div>`;
@@ -491,6 +526,7 @@ async function salvarPesagem() {
             $('#tara').prop('disabled', true);
             $('#peso_medio').prop('disabled', true);
             $('#btnencerra').show();
+            $('#btncancel').show();
         }
     }
 
@@ -575,6 +611,9 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
             if (vpesagem.acl_nrlote == 0) {
                 $('#btnencerra').show();
             }
+            if (vpesagem.acl_nrlote <= 1) {
+                $('#btncancel').show();
+            }
 
             listaItemPesagem();
         }
@@ -638,10 +677,15 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
                                     <i class="fa fa-edit me-2"></i>
                                     Salvar
                                 </button>
-                                <button type="button" id="btnencerra" style="display: none;" class="btn btn-outline-primary m-2" onclick='encerrarPesagem(${stringify(vpesagem)})'>
+                                <button type="button" id="btnencerra" style="display: none;" class="btn btn-outline-primary" onclick='encerrarPesagem(${stringify(vpesagem)},1)'>
                                     <i class="fa fa-check-square me-2"></i>
-                                    Encerrrar
-                                </button>`)}
+                                    Encerrar
+                                </button>
+                                `)}
+                    <button type="button" id="btncancel" style="display: none;" class="btn btn-outline-primary" onclick='encerrarPesagem(${stringify(vpesagem)},3)'>
+                        <i class="fa fa-trash me-2" style="color: red;"></i>
+                        Cancelar
+                    </button>
                 </div>
                 <div class="mb-5"></div>
                 <div class="centralize-pad" id="lista_pesagem">
