@@ -375,14 +375,17 @@ async function listaItemPesagem() {
     let vsup_id = parseInt($('#sup_id').val());
 
     let vcapa = await db._allTables['supesocapa']
-                        .where('sup_id')
+                        .where('id')
                         .equals(vsup_id)
                         .reverse()
                         .sortBy('sup_id');
 
+    if (!vcapa || vcapa.length == 0)
+        vcapa = null;
+
     let vitems = await db._allTables['supesoitem']
                             .where('sup_id')
-                            .equals(vsup_id)
+                            .equals(vcapa[0].sup_id)
                             .reverse()
                             .sortBy('sui_id');
                             
@@ -397,7 +400,7 @@ async function listaItemPesagem() {
                             <th scope="col">Peso</th>
                             <th scope="col">Tara</th>
                             <th scope="col">Peso Médio</th>
-                            <th style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">&nbsp</th>
+                            <th style="display: ${vcapa && vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">&nbsp</th>
                         </tr>
                     </thead>
                     <tbody id="tabitepeso">`;
@@ -406,9 +409,9 @@ async function listaItemPesagem() {
                     <td>${vitems[vite].sui_id}</td>
                     <td>${vitems[vite].sui_qtde}</td>
                     <td>${vitems[vite].sui_pesototal.toFixed(2)}</td>
-                    <td>${vcapa[0].sup_tara}</td>
+                    <td>${vcapa ? vcapa[0].sup_tara : ''}</td>
                     <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
-                    <td style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">
+                    <td style="display: ${vcapa && vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">
                         <i class="fa fa-trash" style="color:red;" onclick="removeItem(${vitems[vite].id})"></i>
                     </td>
                 </tr>`;
@@ -428,7 +431,7 @@ async function listaItemPesagem() {
                     <td>${valor[1].toFixed(2)}</td>
                     <td>${valor[2]}</td>
                     <td>${(valor[1] / valor[0]).toFixed(2)}</td>
-                    <td style="display: ${vcapa[0].acl_nrlote == 0 ? 'flex':'none'};"></td>
+                    <td style="display: ${vcapa && vcapa[0].acl_nrlote == 0 ? 'flex':'none'};"></td>
                 </tr>`;
 
     vcont += `</tbody></table></div>`;
