@@ -44,13 +44,8 @@ async function validaUrl (vurl) {
 
 function isoToUtf8(isoString) {
   const decoder = new TextDecoder('iso-8859-1');
-  const uint8Array = new Uint8Array(isoString.length);
-
-  for (let i = 0; i < isoString.length; i++) {
-    uint8Array[i] = isoString.charCodeAt(i);
-  }
-
-  const utf8String = decoder.decode(uint8Array);
+  
+  const utf8String = decoder.decode(isoString);
   return utf8String;
 }
 
@@ -70,12 +65,12 @@ function descomprime(strdata) {
       const vdescop = inflate.decompress();
       vstring = decoder.decode(new Uint8Array(vdescop));
       //console.log(isoToUtf8(vstring));
-      return isoToUtf8(vstring);
-      //return vstring; // Retorna a string descomprimida
+      //return isoToUtf8(vstring);
+      return vstring; // Retorna a string descomprimida
     } else {
       //console.log(isoToUtf8(vstring));
-      return isoToUtf8(vstring);
-      //return vstring; // Retorna a string original se não estiver comprimida
+      //return isoToUtf8(vstring);
+      return vstring; // Retorna a string original se não estiver comprimida
     }
   } catch (error) {
       console.log(error);

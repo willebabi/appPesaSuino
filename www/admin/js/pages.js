@@ -846,29 +846,32 @@ var vclicksinc = async () => {
                     }
                 } else {
                     await getDados({type: "POST"
-                        ,params: vtb[vo].paramurl + "&vcomp=true&vidpalm=" + localStorage.getItem('APPidpalm')
+                        ,params: vtb[vo].paramurl + "&vcomp=false&vidpalm=" + localStorage.getItem('APPidpalm')
                         ,dataType: "html"
                         ,exec: async (vretorno) => {
-                            var vdados = vretorno.resultado;
-
                             try {
+                                var vdados = vretorno.resultado;
+
+                            
                                 for (var vtable in vdados) {
                                     for (var vdd in vdados[vtable]) {
                                         await vupbase(vtable, vdados[vtable][vdd]);
                                     }
                                 }
+
+                                if(vretorno.status == 1) {
+                                    console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
+                                    console.log(vretorno, vtb, vo);
+                                    $("#msg" + vtb[vo].tab).html("Sucesso!")
+                                    //$("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
+                                    $("#nrg" + vtb[vo].tab).html(vretorno.resultado[vtb[vo].tab].length);
+                                } else {
+                                    $("#msg" + vtb[vo].tab).html("Erro ao receber os dados!")
+                                    $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
+                                }
                             } catch (e) {
                                 console.error(e);
                                 console.log(vdados);
-                            }
-
-                            if(vretorno.status == 1) {
-                                console.log("Sincronização " + vtb[vo].tab + " realizada com sucesso!");
-                                console.log(vretorno, vtb, vo);
-                                $("#msg" + vtb[vo].tab).html("Sucesso!")
-                                //$("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
-                                $("#nrg" + vtb[vo].tab).html(vretorno.resultado[vtb[vo].tab].length);
-                            } else {
                                 $("#msg" + vtb[vo].tab).html("Erro ao receber os dados!")
                                 $("#msg" + vtb[vo].tab).attr("title", JSON.stringify(vretorno));
                             }
