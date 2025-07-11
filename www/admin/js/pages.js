@@ -1,6 +1,6 @@
 var vtb = [
             {"tab":"supesocapa","desc": "E. Pesagens","tipo": "E","paramurl":"class=wsn200ln&method=setPesagens"},
-            {"tab":"pfidpalm","desc": "B. Dados usuários","tipo": "B","paramurl":"class=wsn200ln&method=getPfidpalm", clear: true},
+            {"tab":"pfidpalm","desc": "B. Dados usuários","tipo": "B","paramurl":"class=wsn200ln&method=getPfidpalm", clear: false},
             {"tab":"clifor","desc": "B. Dados Produtores","tipo": "B","paramurl":"class=wsn200ln&method=getPessoas", clear: true},
             {"tab":"tprodsui","desc": "B. Tipos de Criação","tipo": "B","paramurl":"class=wsn200ln&method=getTprodsui", clear: true},
             {"tab":"tprodcli","desc": "B. Produtores e criação","tipo": "B","paramurl":"class=wsn200ln&method=getTprodcli", clear: true}
@@ -45,7 +45,7 @@ function msgsnack(tipo, msg) {
     Snackbar.show({
         text: vico + msg,
         pos: 'top-right',
-        backgroundColor: (tipo == 'S' ? 'DarkGreen' : 'DarkRed'),
+        backgroundColor: vcor,
         textColor: '#FFFFFF',
         actionText: "Ok"
     });
@@ -111,6 +111,9 @@ var vlimpaDados = async () => {
                     eval(`db._allTables['${vtb[vo].tab}'].clear();`);
                 }
             }
+            db.delete();
+            localStorage.clear();
+            document.location.href = '../index.html';
             spinner(0);
 
             $("#m1").click();
@@ -287,6 +290,8 @@ async function listaPesagens() {
 
         if (!vcapa[vi].vclio || !vcapa[vi].vclid) continue;
 
+        let vusu = await getBuscaDados('pfidpalm',{idpalm: parseInt(vcapa[vi].idpalm)});
+
         vcapa[vi].qtdes = 0;
         vcapa[vi].pesos = 0;
         for (let vite in vitems) {
@@ -301,6 +306,7 @@ async function listaPesagens() {
                         <div class="card-body" style="text-align: left;">
                             <h6 class="card-title">Destino: ${vcapa[vi].vclid.cli_fantasi}</h6>
                             <p class="card-text">Data: ${dateFormat(vcapa[vi].sup_data + 'T00:00:00')} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
+                            <p class="card-text">Usuário: ${(vusu ? vusu[0].usu_usuario : '')}</p>
                             <p class="card-text">Quantidade: ${vcapa[vi].qtdes}</p>
                             <p class="card-text">Peso: ${vcapa[vi].pesos.toFixed(2)}</p>
                             <p class="card-text">Ps.Médio: ${(vcapa[vi].pesos / vcapa[vi].qtdes).toFixed(2)}</p>
@@ -514,7 +520,8 @@ async function salvarPesagem() {
         sup_data: $('#data_pesagem').val(),
         sup_id: maxCapa,
         sup_tara: $('#tara').val(),
-        sup_usado: false
+        sup_usado: false,
+        idpalm: parseInt(localStorage.getItem('APPidpalm'))
     };
 
     if (!vcria) {
@@ -1008,7 +1015,14 @@ var vrotas = (vopcao, vo, vtp = null) => {
 
 var iniHome = async () => {
     var vnump    = await getCount('clifor');
+    var vnums    = await getCount('supesocapa', {acl_nrlote: 1});
+
     console.log('iniHome',vnump);
+
+    if (vnums > 0) {
+        msgsnack('A', 'Atenção: Existe pesagens pendentes de sincronização.');
+    }
+
     if (vnump > 0) {
         $("#m1").click();
     } else {

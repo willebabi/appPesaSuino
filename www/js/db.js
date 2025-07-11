@@ -48,8 +48,10 @@ async function getReg (vtb, vobj) {
     return null;
 }
 
-async function getCount (vtb) {
-    if (db._allTables[vtb]) {
+async function getCount (vtb, vobj) {
+    if (vobj) {
+        return (await getBuscaDados(vtb, vobj)).length;
+    } else if (db._allTables[vtb]) {
         return (await db._allTables[vtb].toArray()).length;
     } 
     return 0;
