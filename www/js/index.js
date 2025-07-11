@@ -129,14 +129,15 @@ function ValidaCodAcesso(){
 
                         //percorrer objeto e validar se código informado existe nele
                         if(objEmp.data == null || objEmp.data == undefined || objEmp.data.length == 0){
-                            msg("E",'Erro ao obter dados. Entre em contato com o suporte Agrosys. (get Empresas x APP)');
+                            msg("E",'Erro ao obter dados. Entre em contato com o suporte Agrosys. (getEmpresas x APP)');
                         }else{
                             let vselEmp = objEmp.data.find(o => o.id == codacesso.toString());
+                            console.log(vselEmp);
                             if(vselEmp != null && vselEmp != undefined)
                                 getDadosAcesso();
                             else{
                                 load.hide();
-                                msg("E",'Código inválido ou app e-Agrosys não parâmetrizado em sua empresa. (get Empresas x APP)');
+                                msg("E",'Código inválido ou app sem acesso a internet. (get Empresas x APP)');
                             }
                         }
                     } catch (erC) {

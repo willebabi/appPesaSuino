@@ -12,6 +12,10 @@ let vstatus = {0: '<i class="fa fa-edit me-2" style="color: green;"></i>Aberta',
                2: '<i class="fa fa-sync me-2" style="color: blue;"></i>Sincronizada',
                3: '<i class="fa fa-trash me-2" style="color: red;"></i>Cancelada'};
 
+function sair () {
+    navigator.app.exitApp();
+}
+
 function getValue(vnm) {
     if ($(`#${vnm}`).length > 0) {
         if ($(`#${vnm}`).val() !== undefined) {
@@ -296,8 +300,10 @@ async function listaPesagens() {
                         </div>
                         <div class="card-body" style="text-align: left;">
                             <h6 class="card-title">Destino: ${vcapa[vi].vclid.cli_fantasi}</h6>
-                            <p class="card-text">Data: ${dateFormat(vcapa[vi].sup_data)} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
-                            <p class="card-text">Quantidade: ${vcapa[vi].qtdes} - Peso: ${vcapa[vi].pesos.toFixed(2)} - Ps.Médio: ${(vcapa[vi].pesos / vcapa[vi].qtdes).toFixed(2)}</p>
+                            <p class="card-text">Data: ${dateFormat(vcapa[vi].sup_data + 'T00:00:00')} - Status: ${vstatus[vcapa[vi].acl_nrlote]}</p>
+                            <p class="card-text">Quantidade: ${vcapa[vi].qtdes}</p>
+                            <p class="card-text">Peso: ${vcapa[vi].pesos.toFixed(2)}</p>
+                            <p class="card-text">Ps.Médio: ${(vcapa[vi].pesos / vcapa[vi].qtdes).toFixed(2)}</p>
                         </div>
                         <div class="card-footer text-body-secondary">
                             <div style="display: ${(vcapa[vi].acl_nrlote == 0 ? 'flex': 'none')}; flex-direction: column;">
@@ -372,11 +378,11 @@ async function removeItem (id) {
 
 /*---- Form de pesagem incial ----*/
 async function listaItemPesagem() {
-    let vsup_id = parseInt($('#sup_id').val());
+    let vid = parseInt($('#sup_id').val());
 
     let vcapa = await db._allTables['supesocapa']
                         .where('id')
-                        .equals(vsup_id)
+                        .equals(vid)
                         .reverse()
                         .sortBy('sup_id');
 
@@ -391,7 +397,7 @@ async function listaItemPesagem() {
                             
     let valor = [0, 0, 0]; // [qtde, peso, tara]
     $('#lista_pesagem').html('');
-    let vcont = `<div class="table-responsive">
+    let vcont = `<div class="table-responsive" style="font-size: 1.1em;">
                 <table class="table">
                     <thead>
                         <tr>
@@ -410,9 +416,11 @@ async function listaItemPesagem() {
                     <td>${vitems[vite].sui_qtde}</td>
                     <td>${vitems[vite].sui_pesototal.toFixed(2)}</td>
                     <td>${vcapa ? vcapa[0].sup_tara : ''}</td>
-                    <td>${(vitems[vite].sui_pesototal / vitems[vite].sui_qtde).toFixed(2)}</td>
+                    <td>${((vitems[vite].sui_pesototal - (vcapa ? vcapa[0].sup_tara : 0)) / vitems[vite].sui_qtde).toFixed(2)}</td>
                     <td style="display: ${vcapa && vcapa[0].acl_nrlote == 0 ? 'flex':'none'};">
-                        <i class="fa fa-trash" style="color:red;" onclick="removeItem(${vitems[vite].id})"></i>
+                        <button type="button" id="btncancel" class="btn btn-outline-primary" onclick='removeItem(${vitems[vite].id})'>
+                            <i class="fa fa-trash" style="color: red;"></i>
+                        </button>
                     </td>
                 </tr>`;
         valor[0] += parseInt(vitems[vite].sui_qtde);
@@ -430,7 +438,7 @@ async function listaItemPesagem() {
                     <td>${valor[0]}</td>
                     <td>${valor[1].toFixed(2)}</td>
                     <td>${valor[2]}</td>
-                    <td>${(valor[1] / valor[0]).toFixed(2)}</td>
+                    <td>${((valor[1] - valor[2]) / valor[0]).toFixed(2)}</td>
                     <td style="display: ${vcapa && vcapa[0].acl_nrlote == 0 ? 'flex':'none'};"></td>
                 </tr>`;
 
@@ -495,6 +503,7 @@ async function salvarPesagem() {
         maxCapa = parseInt($('#sup_id').val());
         vcapa = await db._allTables['supesocapa'].get(maxCapa);
         vcria = false;
+        maxCapa = vcapa.sup_id;
     }
 
     /*=== Cria a capa da pesagem e atualiza ===*/
@@ -516,6 +525,8 @@ async function salvarPesagem() {
         }).catch(error => {
             console.log(`Erro supesocapa update ` + error.name);
         });
+
+        $('#sup_id').val(vcapa.id);
     } else {
         let vretorno = await db._allTables['supesocapa'].bulkAdd([vdados], { allKeys: true });
 
@@ -620,6 +631,22 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
 
             listaItemPesagem();
         }
+
+        const camposNumericos = document.querySelectorAll('.no-decimals');
+
+        camposNumericos.forEach(function(campo) {
+            campo.addEventListener('keydown', function(event) {
+                const keyCode = event.key;
+                console.log(keyCode);
+                // Impede a vírgula (,) e o ponto (.)
+                if (keyCode === ',' || keyCode === '.') {
+                    event.preventDefault();
+                }
+            });
+            campo.addEventListener('input', function() {
+                this.value = this.value.replace(/[,.]/g, '');
+            });
+        });
         
     });
     
@@ -657,21 +684,21 @@ async function iniciaPesagem (vprodutor, vpesagem = null) {
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
-                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="quantidade">
+                            <input type="number" step="1" min="0" class="form-control no-decimals" onkeyup="calcularPesoMedio()" id="quantidade">
                             <label for="quantidade">Quantidade:</label>
                         </div>
                         <div class="col form-floating mb-2">
-                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="peso">
+                            <input type="number" step="1" min="0" class="form-control no-decimals" onkeyup="calcularPesoMedio()" id="peso">
                             <label for="peso">Peso Balança:</label>
                         </div>
                     </div>
                     <div class="row row-cols-2">
                         <div class="col form-floating mb-2">
-                            <input type="number" step="any" class="form-control" onkeyup="calcularPesoMedio()" id="tara">
+                            <input type="number" step="1" min="0" class="form-control no-decimals" onkeyup="calcularPesoMedio()" id="tara">
                             <label for="tara">Peso Tara:</label>
                         </div>
                         <div class="col form-floating mb-2">
-                            <input type="number" step="any" readonly class="form-control" id="peso_medio">
+                            <input type="number" step="any" min="0" readonly class="form-control no-decimals" id="peso_medio">
                             <label for="peso_medio">Peso Médio:</label>
                         </div>
                     </div>

@@ -33,7 +33,8 @@
       "cordova-plugin-clear-data": {},
       "cordova-plugin-networkinterface": {},
       "cordova-plugin-keyboard": {},
-      "cordova-plugin-android-permissions": {}
+      "cordova-plugin-android-permissions": {},
+      "cordova.custom.plugins.exitapp": {}
     },
     "platforms": [
       "android"
@@ -50,6 +51,7 @@
     "cordova-plugin-device": "^2.1.0",
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-enable-cleartext-traffic": "^2.1.0",
+    "cordova-plugin-exitapp": "^1.0.0",
     "cordova-plugin-file": "^7.0.0",
     "cordova-plugin-ios-disable-bounce": "^0.0.1",
     "cordova-plugin-keyboard": "^1.3.0",
